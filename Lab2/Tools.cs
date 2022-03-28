@@ -83,15 +83,30 @@ namespace Lab2
                 }
             }
             classAvgGrade = (double)classGradesTotal / assignmentsPerClass;
-
-            Console.WriteLine(" The {0} Classroom has {1} students.", className, stdCount);
-            Console.WriteLine(" There are a total of {0} assignments in this class.", assignmentsPerClass);
+                        
+            Console.Write(" Classroom size: ");
+            ColorChangerCaution();
+            Console.WriteLine($"{stdCount} Students.");
+            Console.ResetColor();    
+            Console.Write(" Total number of assignments: ");
+            ColorChangerCaution();
+            Console.WriteLine(assignmentsPerClass);
+            Console.ResetColor(); 
             if (assignmentsPerClass == 0)
-                Console.WriteLine(" The average grade cannot be computated at this time.");
-            else
-                Console.WriteLine($" The average grade of the class is {classAvgGrade}");
+            {                
+                Console.Write(" Average Classroom grade: ");
+                ColorChangerCaution();
+                Console.WriteLine("Cannot be calculated.");
+                Console.ResetColor();
+            } else
+            {
+                Console.Write($" Average Classroom grade: ");
+                ColorChangerCaution();
+                Console.WriteLine(classAvgGrade);
+                Console.ResetColor();
+            }
+            // Add code to show the top and lowest grades, including the students' names
 
-            Console.WriteLine();
         }
         public static string ClassStats(int classIndex)
         {

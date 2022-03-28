@@ -18,8 +18,7 @@ namespace Lab2
             {
                 mainMenuLoop = MainMenu(mainMenuLoop);
             }
-            Console.WriteLine("Another Test");
-            Console.Read();
+            
             TestingClass.Testing();
         }
     }

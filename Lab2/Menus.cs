@@ -131,8 +131,8 @@ namespace Lab2
                 try
                 {
                     Console.Clear();
-                    ClassSubMenuHeader("className".ToUpper());
-                    OverallStdInfo();
+                    ClassSubMenuHeader(className.ToUpper());
+                    IndividualClassStats(index);
                     Console.WriteLine("\n" +
                         "\n           1. Detailed Student View" +
                         "\n           2. Add New Student" +

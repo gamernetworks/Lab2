@@ -36,7 +36,7 @@ namespace Lab2
         {
             Console.BackgroundColor = ConsoleColor.Black;
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("\n                     {0} CLASSROOM", className);
+            Console.WriteLine("\n {0} CLASS", className);
             Console.ResetColor();
             Console.WriteLine("********************************************************");
         }
