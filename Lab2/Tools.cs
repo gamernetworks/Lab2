@@ -65,10 +65,12 @@ namespace Lab2
             int classCount = classrooms.Count;
             string className = classrooms[classIndex].className;
             int stdCount = classrooms[classIndex].students.Count;
+            List<Student> stdGradesList = new List<Student>();
 
             int classGradesTotal = 0;
             int assignmentsPerClass = 0;
             double classAvgGrade = 0;
+            int key = 0;
 
             for (int j = 0; j < stdCount; j++)
             {
@@ -80,8 +82,20 @@ namespace Lab2
                 for (int k = 0; k < classrooms[classIndex].students[j].assignments.Count; k++)
                 {
                     classGradesTotal += classrooms[classIndex].students[j].assignments[k].assignmentGrade;
+                    stdGradesList.Add(new Student(classrooms[classIndex].students[j].studName));
+                    stdGradesList[key].assignments.Add(new Assignment(classrooms[classIndex].students[j].assignments[k].assignmentName,
+                        classrooms[classIndex].students[j].assignments[k].assignmentGrade));
+                    key++;
+                        /*classrooms[classIndex].students[j].studName,
+                        classrooms[classIndex].students[j].assignments[k].assignmentName,
+                        classrooms[classIndex].students[j].assignments[k].assignmentGrade);*/
+                    //stdGradesList.Add(classrooms[classIndex].students[j].studName,
+                    //    classrooms[classIndex].students[j].assignments[k].assignmentGrade);*?
+                    //stdGradesList.Add(classrooms[classIndex].students[j].assignments[k].assignmentGrade);
                 }
             }
+            stdGradesList.Max(x => x.assignments);
+
             classAvgGrade = (double)classGradesTotal / assignmentsPerClass;
                         
             Console.Write(" Classroom size: ");
@@ -105,6 +119,7 @@ namespace Lab2
                 Console.WriteLine(classAvgGrade);
                 Console.ResetColor();
             }
+
             // Add code to show the top and lowest grades, including the students' names
 
         }

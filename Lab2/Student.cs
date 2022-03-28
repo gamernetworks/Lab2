@@ -14,6 +14,10 @@ namespace Lab2
         public string studName;
         public List<Assignment> assignments = new List<Assignment>();
         public Student() { }
+        public Student(string name) : this()
+        {
+            studName = name;
+        }
         public Student(string firstName, string lastName) : this()
         {
             studFirstName = firstName;
