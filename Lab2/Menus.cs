@@ -79,7 +79,7 @@ namespace Lab2
                         Console.Write("\n Enter the name of the classroom: ");
                         Console.ResetColor();
                         string className = Console.ReadLine().ToLower();
-                        int index = classrooms.FindIndex(x => x.className.ToLower() == className);
+                        int index = classrooms.FindIndex(x => x.className.ToLower() == className);                        
                         if (index < 0)
                         {
                             classMainMenuSelection = 1;
@@ -132,7 +132,9 @@ namespace Lab2
                 {
                     Console.Clear();
                     ClassSubMenuHeader(className.ToUpper());
+                    ClassSubHeader();
                     IndividualClassStats(index);
+
                     Console.WriteLine("\n" +
                         "\n           1. Detailed Student View" +
                         "\n           2. Add New Student" +

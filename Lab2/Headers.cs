@@ -25,10 +25,17 @@ namespace Lab2
             Console.ResetColor();
             Console.WriteLine("********************************************************");
         }
-        public static void ClassHeader()
+        public static void ClassMainHeader()
         {
             ColorChangerCaution();
             Console.WriteLine(" ID       Class Name      Total Students      Avg Grade");
+            Console.ResetColor();
+            Console.WriteLine("********************************************************");
+        }
+        public static void ClassSubHeader()
+        {
+            ColorChangerCaution();
+            Console.WriteLine(" ID   Class Name    Students    Assignments    Avg Grade");
             Console.ResetColor();
             Console.WriteLine("********************************************************");
         }

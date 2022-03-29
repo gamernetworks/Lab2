@@ -29,7 +29,7 @@ namespace Lab2
             classrooms[3].students[0].assignments.Add(new Assignment("Animals", 79));
             classrooms[3].students[0].assignments.Add(new Assignment("A&P", 0));
             classrooms[3].students.Add(new Student("Byron", "Montalvo"));
-            classrooms[3].students[1].assignments.Add(new Assignment("Plants", 95));
+            classrooms[3].students[1].assignments.Add(new Assignment("Plants", 100));
             classrooms[3].students.Add(new Student("Jarianna", "Montalvo"));
             classrooms[3].students[2].assignments.Add(new Assignment("Animals", 100));
             classrooms[3].students[2].assignments.Add(new Assignment("Plants", 95));

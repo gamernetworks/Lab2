@@ -28,13 +28,13 @@ namespace Lab2
         public Classroom(int ID, string name, Student a) : this(ID, name) { }
         public static void ViewAllClassroomsInfo()
         {
-            int classCount = classrooms.Count;
+            //int classCount = classrooms.Count;
             int i = 0;
 
-            ClassHeader();
+            ClassMainHeader();
             foreach (var classroom in classrooms)
             {
-                Console.WriteLine(string.Format(" {0,-9}{1,-23}{2,-16}{3,-14}", classroom.classID, classroom.className, classroom.students.Count, ClassStats(i)));
+                Console.WriteLine(string.Format(" {0,-9}{1,-23}{2,-16}{3,-14}", classroom.classID, classroom.className, classroom.students.Count, ClassAvgGPAStats(i)));
                 i++;
             }
         }
