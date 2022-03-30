@@ -10,14 +10,14 @@ namespace Lab2
     internal class TestingClass
     {
         public static void Testing()
-        {
+        {/*
             //// Create the List ////
-            /*
+            
             //List<Classroom> classrooms = new List<Classroom>(); // This list is created in the GlobalVariables
-            */
+            
 
             //// Entering the Data ////
-            /*
+            
             // Syntax 1: (DOES NOT WORK. It tries to add the student before creating a new Classroom. ASK INSTRUCTOR
             //List<Classroom> classrooms = new List<Classroom>()
             //{
@@ -51,7 +51,7 @@ namespace Lab2
 
             // Syntax 4: (DOES NOT WORK. It tries to add the student before creating a new Classroom
             // classrooms.Add(new Classroom("Biology", new Student("Oscar")));
-            */
+            
 
             //// Printing the data ////
 
@@ -144,12 +144,6 @@ namespace Lab2
             }
             Console.WriteLine();
 
-
-
-
-
-
-
             // Syntax 7: I can print the classrom name once followed by the students in it horizontal order.
             for (int i = 0; i < classrooms.Count; i++) // classrooms.Count used to count the amount of classrooms in the list
             {
@@ -163,11 +157,9 @@ namespace Lab2
             }
             Console.WriteLine();
 
-
-
             Console.WriteLine();
 
-
+            */
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -65,52 +66,42 @@ namespace Lab2
                     Console.WriteLine("\n" +
                         "\n           1. Manage Classroom" +
                         "\n           2. Add New Classroom" +
-                        "\n           3. Edit Classroom" +
-                        "\n           4. Remove Classroom" +
+                        "\n           3. Edit Classroom Name" +
+                        "\n           4. Remove Classroom\n" +
                         "\n           5. Return to Previous Menu" +
                         "\n           6. Quit Application");
                     if (classMainMenuSelection < 1 || classMainMenuSelection > 6)
                     {
                         classMainMenuSelection = ReadKeyInput();
                     }
-                    if (classMainMenuSelection == 1)
+                    if (classMainMenuSelection == 1) // Goto Classroom SubMenu
                     {
-                        ColorChangerCaution();
-                        Console.Write("\n Enter the name of the classroom: ");
-                        Console.ResetColor();
-                        string className = Console.ReadLine().ToLower();
-                        int index = classrooms.FindIndex(x => x.className.ToLower() == className);                        
-                        if (index < 0)
-                        {
-                            classMainMenuSelection = 1;
-                            break;
-                        }
-                        else
-                            ClassSubMenu(index, className);
+                        classMainMenuSelection = ManageClass();
+                        break;
                     }
-                    else if (classMainMenuSelection == 2)
+                    else if (classMainMenuSelection == 2) // Add New Classroom
+                    {                        
+                        classMainMenuSelection = AddClass();
+                        break;
+                    }
+                    else if (classMainMenuSelection == 3) // Edit Classroom Name
                     {
-                        AddClass();
-                        classMainMenuSelection = 0;
+                        classMainMenuSelection = EditClassName();
+                        break;
                     }
-                    else if (classMainMenuSelection == 3)
+                    else if (classMainMenuSelection == 4) // Remove Classroom
                     {
-                        EditClass();
-                        classMainMenuSelection = 0;
+                        classMainMenuSelection = RemoveClass();
+                        break;
                     }
-                    else if (classMainMenuSelection == 4)
-                    {
-                        RemoveClass();
-                        classMainMenuSelection = 0;
-                    }
-                    else if (classMainMenuSelection == 5)
+                    else if (classMainMenuSelection == 5) // Return to Previous Menu
                     {
                         classMainMenuSelection = 0;
                         mainMenuSelection = 0;
                         mainMenuLoop = true;
                         break;
                     }
-                    else if (classMainMenuSelection == 6)
+                    else if (classMainMenuSelection == 6) // Quit Application
                     {
                         classMainMenuSelection = 0;
                         mainMenuSelection = 2;
@@ -124,22 +115,21 @@ namespace Lab2
             }
             return true;
         }
-        public static bool ClassSubMenu(int index, string className)
+        public static bool ClassSubMenu(int classIndex)
         {
             while (true)
             {
                 try
                 {
                     Console.Clear();
-                    ClassSubMenuHeader(className.ToUpper());
-                    ClassSubHeader();
-                    IndividualClassStats(index);
-
+                    var a = SecondIndividualClassStats(classIndex);                    
+                    ClassSubMenuHeader(a.Item1, a.Item2, a.Item3, a.Item4);
+                    FirstIndividualClassStats(classIndex);
                     Console.WriteLine("\n" +
-                        "\n           1. Detailed Student View" +
+                        "\n           1. View Student Detailed Information" +
                         "\n           2. Add New Student" +
                         "\n           3. Remove Student" +
-                        "\n           4. Compare Students" +
+                        "\n           4. Compare Students\n" +
                         "\n           5. Return to Previous Menu" +
                         "\n           6. Quit Application");
                     if (classSubMenuSelection < 1 || classSubMenuSelection > 6)
@@ -148,17 +138,15 @@ namespace Lab2
                     }
                     if (classSubMenuSelection == 1)
                     {
-                        StdMenu();
+                        classSubMenuSelection = ManageStd(classIndex);
                     }
                     else if (classSubMenuSelection == 2)
                     {
-                        AddStd();
-                        classSubMenuSelection = 0;
+                        classSubMenuSelection = AddStd(classIndex);                            
                     }
                     else if (classSubMenuSelection == 3)
                     {
-                        RemoveStd();
-                        classSubMenuSelection = 0;
+                        classSubMenuSelection = RemoveStd(classIndex);
                     }
                     else if (classSubMenuSelection == 4)
                     {
@@ -188,14 +176,14 @@ namespace Lab2
             }
             return true;
         }
-        public static bool StdMenu()
+        public static bool StdMenu(int classIndex, int stdIndex)
         {
             while (true)
             {
                 try
                 {
                     Console.Clear();
-                    StdMenuHeader("test student".ToUpper());
+                    StdSubMenuHeader(classIndex, stdIndex);
                     ShowStdBestGrade();
                     ShowStdWorseGrade();
                     ViewAssignment();
@@ -203,7 +191,7 @@ namespace Lab2
                         "\n           1. Edit Student Information" +
                         "\n           2. Assign New Assignment" +
                         "\n           3. Remove Assignment" +
-                        "\n           4. Add/Edit Grade" +
+                        "\n           4. Add/Edit Grade\n" +
                         "\n           5. Return to Previous Menu" +
                         "\n           6. Quit Application");
                     if (stdMenuSelection < 1 || stdMenuSelection > 6)
