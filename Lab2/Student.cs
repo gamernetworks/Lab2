@@ -8,6 +8,7 @@ using static Lab2.Tools;
 using static Lab2.GlobalVariables;
 using static Lab2.Headers;
 using static Lab2.Classroom;
+using static Lab2.Assignment;
 
 namespace Lab2
 {
@@ -42,12 +43,7 @@ namespace Lab2
         {
             studName = firstName + " " + lastName;
         }
-        public static void OverallStdInfo()
-        {
-            Console.WriteLine("You can view the student detailed information here.");
-            Console.ReadKey();
-        }
-        public static void DetailedStdInfo()
+        public static void StdStats()
         {
 
 
@@ -61,8 +57,7 @@ namespace Lab2
 
 
 
-            Console.WriteLine("You can view the student detailed information here.");
-            Console.ReadKey();
+
         }
         public static int AddStd(int classIndex)
         {
@@ -113,10 +108,59 @@ namespace Lab2
             Console.ReadKey();
             return 0;
         }
-        public static void EditStd()
+        public static int EditStdName(int classIndex, int stdIndex)
         {
-            Console.WriteLine("You can edit a student");
+            string oldStdName;
+            string newStdName;
+            string newFirstName;
+            string newLastName;
+            int stdIndexHelper = 0;
+
+            Console.Clear();
+            StdSubMenuHeader(classIndex, stdIndex, StdGPACalc(classIndex, stdIndex).ToString());
+            ViewAssignment(classIndex, stdIndex);
+            // Edit Code Below...create a method
+            /*foreach (var classroom in classrooms[classIndex].students)
+            {
+                Console.WriteLine(string.Format(" {0,-9}{1,-25}{2,-15}{3,-13}",
+                    classroom.studID, classroom.studName, classroom.assignments.Count, StdGPACalc(classIndex, stdIndex)));
+                stdIndex++;
+            }*/
+            if (classrooms[classIndex].students.Count <= 0)
+            {
+                PrintLineRed__("\n There are no students in this classroom. \n Press any key to continue.");
+                Console.ReadKey();
+                return 0;
+            }
+
+            PrintBlue_("\n Enter the new first name: ");
+            newFirstName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(Console.ReadLine().ToLower());
+            PrintBlue_(" Enter the new last name: ");
+            newLastName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(Console.ReadLine().ToLower());
+            oldStdName = classrooms[classIndex].students[stdIndex].studName;
+            classrooms[classIndex].students[stdIndex].studFirstName = newFirstName;
+            classrooms[classIndex].students[stdIndex].studLastName = newLastName;
+            classrooms[classIndex].students[stdIndex].studName = newFirstName + " " + newLastName;
+            newStdName = classrooms[classIndex].students[stdIndex].studName;
+
+            Console.Clear();
+            StdSubMenuHeader(classIndex, stdIndex, StdGPACalc(classIndex, stdIndex).ToString());
+            StdMenuHeader();
+            foreach (var classroom in classrooms[classIndex].students[stdIndex].assignments)
+            {
+                Console.WriteLine(string.Format(" {0,-11}{1,-22}{2,-12}{3,-13}",
+                    classroom.assignmentID, classroom.assignmentName, classroom.assignmentGrade, classroom.assignmentStatus));
+                stdIndexHelper++;
+            }
+
+            stdIndexHelper = 0;
+            Console.Write($"\n Student ");
+            PrintRed__(oldStdName);
+            Console.Write(" has been successfully renamed ");
+            PrintLineRed__($"{newStdName}.");
+            Console.WriteLine(" Press any key to continue.");
             Console.ReadKey();
+            return 0; // mainMenuSelection to complete operation              
         }
         public static int RemoveStd(int classIndex)
         {
@@ -127,6 +171,12 @@ namespace Lab2
             int stdIndexHelper = 0;
             ClassSubMenuHeader(className);
             ClassSubHeader();
+            if (classrooms[classIndex].students.Count <= 0)
+            {
+                PrintLineRed__("\n There are no students in this classroom. \n Press any key to continue.");
+                Console.ReadKey();
+                return 0;
+            }
             foreach (var classroom in classrooms[classIndex].students)
             {
                 Console.WriteLine(string.Format(" {0,-9}{1,-25}{2,-15}{3,-13}",
@@ -134,7 +184,7 @@ namespace Lab2
                 stdIndexHelper++;
             }
             PrintLineRed__("\n Type \"Q\" to cancel this operation.");
-            PrintBlue_("\n Enter the student's full name: ");
+            PrintBlue_(" Enter the student's full name: ");
             string stdName = Console.ReadLine().Trim().ToLower();
 
             if (stdName == "q")
@@ -279,15 +329,23 @@ namespace Lab2
                 }
             }
         }
-        public static void ShowStdBestGrade()
+        public static int CompareClassStd(int classIndex)
         {
-            Console.WriteLine("You can see the student best grade");
-            Console.ReadKey();
-        }
-        public static void ShowStdWorseGrade()
-        {
-            Console.WriteLine("You can see the student worse grade");
-            Console.ReadKey();
+            string className = classrooms[classIndex].className;
+
+            Console.Clear();
+            var a = SecondIndividualClassStats(classIndex);
+            //int stdIndexHelper = 0;
+            ClassSubMenuHeader(className);
+            ClassSubHeader();
+
+            if (classrooms[classIndex].students.Count <= 1)
+            {
+                PrintLineRed__("\n There are no students in this classroom. \n Press any key to continue.");
+                Console.ReadKey();
+                return 0;
+            }
+            return 0;
         }
     }
 }

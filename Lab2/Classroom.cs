@@ -65,6 +65,12 @@ namespace Lab2
             Console.Clear();
             ClassMainMenuHeader();
             ViewAllClassroomsInfo();
+            if (classrooms.Count <= 0)
+            {
+                PrintLineRed__("\n There are no classrooms in the program. \n Press any key to continue.");
+                Console.ReadKey();
+                return 0;
+            }
             PrintLineRed__("\n Type \"Q\" to cancel this operation. ");
             PrintBlue_(" Enter the classroom's name or ID number: ");
             string className = Console.ReadLine().ToLower();
@@ -113,6 +119,13 @@ namespace Lab2
             int stdIndex = 0;
             ClassSubMenuHeader(className);
             ClassSubHeader();
+            if (classrooms[classIndex].students.Count <= 0)
+            {
+                PrintLineRed__("\n There are no students in this classroom. \n Press any key to continue.");
+                Console.ReadKey();
+                return 0;
+            }
+
             foreach (var classroom in classrooms[classIndex].students)
             {
                 Console.WriteLine(string.Format(" {0,-9}{1,-25}{2,-15}{3,-13}",
@@ -185,6 +198,12 @@ namespace Lab2
             Console.Clear();
             ClassMainMenuHeader();
             ViewAllClassroomsInfo();
+            if (classrooms.Count <= 0)
+            {
+                PrintLineRed__("\n There are no classrooms in the program. \n Press any key to continue.");
+                Console.ReadKey();
+                return 0;
+            }
             PrintLineRed__("\n Type \"Q\" to cancel this operation. ");
             PrintBlue_(" Enter the classroom's name or ID number: ");
             string oldClassName = Console.ReadLine().ToLower();
@@ -266,8 +285,14 @@ namespace Lab2
             Console.Clear();
             ClassMainMenuHeader();
             ViewAllClassroomsInfo();
+            if (classrooms.Count <= 0)
+            {
+                PrintLineRed__("\n There are no classrooms in the program. \n Press any key to continue.");
+                Console.ReadKey();
+                return 0;
+            }
             PrintLineRed__("\n Type \"Q\" to cancel this operation.");
-            PrintBlue_(" Enter the name of the classroom: ");
+            PrintBlue_(" Enter the classroom name or ID number: ");
             string className = Console.ReadLine().Trim().ToLower();
 
             if (className == "q")
@@ -296,7 +321,7 @@ namespace Lab2
                     PrintRed__("?");
                     do
                     {
-                        PrintRed__(" Type \"Yes\" to proceed or \"No\" to Cancel. ");
+                        PrintRed__("\n Type \"Yes\" to proceed or \"No\" to Cancel. ");
                         ColorChangeToBlue();
                         deleteClassroom = Console.ReadLine().ToLower();
                         if (deleteClassroom == "yes")
@@ -317,7 +342,7 @@ namespace Lab2
                 }
             }
             else
-            {
+            {                
                 int classIDIndex = classrooms.FindIndex(x => x.classID == int.Parse(className));
                 if (classIDIndex == -1)
                 {
@@ -333,10 +358,10 @@ namespace Lab2
                     ViewAllClassroomsInfo(className);
                     PrintRed__("\n Are you sure you want to delete ");
                     Console.Write(className);
-                    PrintLineRed__("?");
+                    PrintRed__("?");
                     do
                     {
-                        PrintRed__(" Type \"Yes\" to proceed or \"No\" to Cancel. ");
+                        PrintRed__("\n Type \"Yes\" to proceed or \"No\" to Cancel. ");
                         ColorChangeToBlue();
                         deleteClassroom = Console.ReadLine().ToLower();
                         if (deleteClassroom == "yes")
@@ -356,26 +381,6 @@ namespace Lab2
                     return 0; // mainMenuSelection to complete operation
                 }
             }
-        }
-        public static void ShowClassAverage()
-        {
-            Console.WriteLine("You can view the class average grade");
-            Console.ReadKey();
-        }
-        public static void ShowClassTopStudent()
-        {
-            Console.WriteLine("You can view the top student");
-            Console.ReadKey();
-        }
-        public static void ShowClassBottomStudent()
-        {
-            Console.WriteLine("You can view the worse student");
-            Console.ReadKey();
-        }
-        public static void CompareClassStd()
-        {
-            Console.WriteLine("You can compare students");
-            Console.ReadKey();
         }
     }
 }

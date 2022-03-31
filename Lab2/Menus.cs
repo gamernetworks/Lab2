@@ -129,7 +129,7 @@ namespace Lab2
                         "\n           1. View Student Detailed Information" +
                         "\n           2. Add New Student" +
                         "\n           3. Remove Student" +
-                        "\n           4. Compare Students\n" +
+                        "\n           4. Compare Students. (Disabled as the information is already displayed. \n" +
                         "\n           5. Return to Previous Menu" +
                         "\n           6. Quit Application");
                     if (classSubMenuSelection < 1 || classSubMenuSelection > 6)
@@ -150,9 +150,7 @@ namespace Lab2
                     }
                     else if (classSubMenuSelection == 4)
                     {
-                        CompareClassStd();
                         classSubMenuSelection = 0;
-                        //mainMenuLoop = true;
                     }
                     else if (classSubMenuSelection == 5)
                     {
@@ -183,13 +181,12 @@ namespace Lab2
                 try
                 {
                     Console.Clear();
-                    StdSubMenuHeader(classIndex, stdIndex);
-                    ShowStdBestGrade();
-                    ShowStdWorseGrade();
-                    ViewAssignment();
+                    StdSubMenuHeader(classIndex, stdIndex, StdGPACalc(classIndex, stdIndex).ToString());
+                    ViewAssignment(classIndex, stdIndex);
+                    StdBestWorseGrades(classIndex, stdIndex);
                     Console.WriteLine("\n" +
-                        "\n           1. Edit Student Information" +
-                        "\n           2. Assign New Assignment" +
+                        "\n           1. Edit Student Name" +
+                        "\n           2. Add New Assignment" +
                         "\n           3. Remove Assignment" +
                         "\n           4. Add/Edit Grade\n" +
                         "\n           5. Return to Previous Menu" +
@@ -200,23 +197,19 @@ namespace Lab2
                     }
                     if (stdMenuSelection == 1)
                     {
-                        EditStd();
-                        stdMenuSelection = 0;
+                        stdMenuSelection = EditStdName(classIndex, stdIndex);
                     }
                     else if (stdMenuSelection == 2)
                     {
-                        AddAssignment();
-                        stdMenuSelection = 0;
+                        stdMenuSelection = AddAssignment(classIndex, stdIndex);
                     }
                     else if (stdMenuSelection == 3)
                     {
-                        RemoveAssignment();
-                        stdMenuSelection = 0;
+                        stdMenuSelection = RemoveAssignment(classIndex, stdIndex);
                     }
                     else if (stdMenuSelection == 4)
                     {
-                        AddEditGrade();
-                        stdMenuSelection = 0;
+                        stdMenuSelection = AddEditGrade(classIndex, stdIndex);
                     }
                     else if (stdMenuSelection == 5)
                     {

@@ -40,43 +40,34 @@ namespace Lab2
                 // If input cannot be converted into int then return 0
                 return 0;
             }
-        }
-        public static void ColorChangeToBlue()
+        }        
+        public static void StdBestWorseGrades(int classIndex, int stdIndex)
         {
-            Console.BackgroundColor = ConsoleColor.Black;
-            Console.ForegroundColor = ConsoleColor.Blue;
-        }
-        public static void ColorChangeToRed()
-        {
-            Console.BackgroundColor = ConsoleColor.Black;
-            Console.ForegroundColor = ConsoleColor.Red;
-        }
-        public static void IndividualStdStatsCalc(int classIndex, int stdIndex)
-        {
-            // classIndex - This is the class Index that would be passed to this function
-            // stdIndex - This is the student Index that would be passed to this function
-
             string stdName = classrooms[classIndex].students[stdIndex].studName;
-            int stdGradesTotal = 0;
-            int assignmentsPerStd = 0;
-            double stdAvgGrade;
-
-            assignmentsPerStd += classrooms[classIndex].students[stdIndex].assignments.Count;
-
-            for (int i = 0; i < assignmentsPerStd; i++)
+            int assignmentsPerStd = classrooms[classIndex].students[stdIndex].assignments.Count;
+            int maxGrade;
+            int minGrade;
+                        
+            try
             {
-                stdGradesTotal += classrooms[classIndex].students[stdIndex].assignments[i].assignmentGrade;
+                maxGrade = classrooms[classIndex].students[stdIndex].assignments.Max(x => x.assignmentGrade);
+                PrintLineRed__ ($"\n Best Grade is: {maxGrade}");
             }
-            stdAvgGrade = (double)stdGradesTotal / assignmentsPerStd;
-
-            Console.WriteLine(" {0} has a total of {1} assignments in this class.", stdName, assignmentsPerStd);
-            if (assignmentsPerStd == 0)
-                Console.WriteLine(" The average grade cannot be computated at this time.");
-            else
-                Console.WriteLine(" {0} average grade is {1}", stdName, stdAvgGrade);
-            Console.WriteLine();
+            catch
+            {
+                PrintLineRed__(" Unable to calculate the best grade at this time.");
+            }
+            try
+            {
+                minGrade = classrooms[classIndex].students[stdIndex].assignments.Min(x => x.assignmentGrade);
+                PrintLineRed__($" Worse Grade is: {minGrade}");
+            }
+            catch
+            {
+                PrintLineRed__(" Unable to calculate the worse grade at this time.");
+            }
         }
-        public static double StdGPACalc(int classIndex, int stdIndex)
+        public static string StdGPACalc(int classIndex, int stdIndex)
         {
             int stdGradesTotal = 0;
             int assignmentsPerStd;
@@ -89,18 +80,20 @@ namespace Lab2
                 stdGradesTotal += classrooms[classIndex].students[stdIndex].assignments[i].assignmentGrade;
             }
             stdAvgGrade = (double)stdGradesTotal / assignmentsPerStd;
+            stdAvgGrade = Math.Round(stdAvgGrade, 2);
 
             if (assignmentsPerStd == 0)
-                return 0;
+                return "N/A";
             else
-                return stdAvgGrade;
+                return stdAvgGrade.ToString();
         }
         public static void IndividualStdStats(int classIndex, int stdIndex)
         {
             string stdName = classrooms[classIndex].students[stdIndex].studName;
             int stdAssignmentCount = classrooms[classIndex].students[stdIndex].assignments.Count;            
             int bottomGrade = classrooms[classIndex].students[stdIndex].assignments.Min(x => x.assignmentGrade);
-            double stdGPA = StdGPACalc(classIndex, stdIndex);            int topGrade;
+            string stdGPA = StdGPACalc(classIndex, stdIndex);
+            int topGrade;
 
             try
             {
@@ -111,10 +104,8 @@ namespace Lab2
             {
                 topGrade = 0;
             }
-            
 
-            ClassSubHeader();
-                        
+            ClassSubHeader();                        
             foreach (var classroom in classrooms[classIndex].students[stdIndex].assignments)
             {
                 Console.WriteLine(string.Format(" {0,-9}{1,-25}{2,-15}{3,-13}",
@@ -126,25 +117,11 @@ namespace Lab2
             int classCount = classrooms.Count;
             string className = classrooms[classIndex].className;
             int stdCount = classrooms[classIndex].students.Count;
+            int assignmentsPerClass = 0;
             List<Tools> stdGradesList = new List<Tools>();
             List<string> filteredClassroomList = new List<string>();
 
             ClassSubHeader();
-
-            //int classGradesTotal = 0;
-            //int assignmentsPerClass = 0;
-            //double classAvgGrade = 0;
-            //int key = 0;
-
-            // Collects class's ID, name, Std count and GPA: Syntax 1
-            /*
-            for (int j = 0; j < stdCount; j++)
-            {
-                assignmentsPerClass += classrooms[classIndex].students[j].assignments.Count;
-            }
-            */
-
-            // Prints class's ID, name, Assignment count and GPA: Syntax 2
             int stdIndex = 0;
             foreach (var classroom in classrooms[classIndex].students)
             {
@@ -154,111 +131,79 @@ namespace Lab2
             }            
 
             List<Tools> stdGPAList = new List<Tools>();
+
             for (int j = 0; j < stdCount; j++)
             {
-                stdGPAList.Add(new Tools(classrooms[classIndex].students[j].studName, StdGPACalc(classIndex, j)));
+                try
+                {
+                    stdGPAList.Add(new Tools(classrooms[classIndex].students[j].studName, double.Parse(StdGPACalc(classIndex, j))));
+                }
+                catch
+                {
+                    stdGPAList.Add(new Tools(classrooms[classIndex].students[j].studName, 0));
+                }
             }
+
             double maxGPA;
             Console.WriteLine();
+
+            for (int j = 0; j < stdCount; j++)
+            {
+                assignmentsPerClass += classrooms[classIndex].students[j].assignments.Count;
+            }
+
             try
             {
                 maxGPA = stdGPAList.Max(x => x.gpa);
-            }
-            catch
-            {
-                maxGPA = 0;
-            }
-            IEnumerable<Tools> queryMax = from stdName in stdGPAList
-                                          where stdName.gpa.Equals(maxGPA)
-                                          select stdName;
-            if (queryMax.Count() > 1)
-                PrintLineBlue_(" Top Students are: ");
-            else
-                PrintLineBlue_(" Top Student is: ");
-            foreach (var item in queryMax)
-            {
-                Console.WriteLine($" GPA of {item.gpa}: {item.stdName}");
-            }
-            double minGPA;
-            try
-            {
-                minGPA = stdGPAList.Min(x => x.gpa);
-            }
-            catch
-            {
-                minGPA = 0;
-            }
-            IEnumerable<Tools> queryMin = stdGPAList.Where(x => x.gpa.Equals(minGPA));
-            if (queryMin.Count() > 1)
-                PrintLineBlue_(" Bottom Students are: ");
-            else
-                PrintLineBlue_(" Bottom Student is: ");
-            foreach (var item in queryMin)
-            {
-                Console.WriteLine($" GPA of {item.gpa}: {item.stdName}");
-            }
-
-            /*
-            for (int j = 0; j < stdCount; j++)
-            {
-                key = 0;
-                for (int k = 0; k < classrooms[classIndex].students[j].assignments.Count; k++)
+                IEnumerable<Tools> queryMax = from stdName in stdGPAList
+                                              where stdName.gpa.Equals(maxGPA)
+                                              select stdName;
+                if (maxGPA == 0 && assignmentsPerClass <= 0)
                 {
-                    classGradesTotal += classrooms[classIndex].students[j].assignments[k].assignmentGrade;
-                    stdGradesList.Add(new Tools(classrooms[classIndex].students[j].studName,
-                    classrooms[classIndex].students[j].assignments[k].assignmentName,
-                    classrooms[classIndex].students[j].assignments[k].assignmentGrade));
-                    key++;
-                }
+                    PrintRed__(" There are no assignments for any student assigned to the class.");
+                } else if (stdCount == 0)
+                {
+                    PrintRed__(" There are no students assigned to the class.");
+                } else
+                {
+                    if (queryMax.Count() > 1)
+                    {
+
+                        PrintLineBlue_(" Top Students are: ");
+                    } else
+                    {
+                        PrintLineBlue_(" Top Student is: ");
+                        foreach (var item in queryMax)
+                        {
+                            Console.WriteLine($" GPA of {item.gpa}: {item.stdName}");
+                        }
+                        double minGPA;
+                        try
+                        {
+                            minGPA = stdGPAList.Min(x => x.gpa);
+                        }
+                        catch
+                        {
+                            minGPA = 0;
+                        }
+
+                        IEnumerable<Tools> queryMin = stdGPAList.Where(x => x.gpa.Equals(minGPA));
+                        if (queryMin.Count() > 1)
+                            PrintLineBlue_(" Bottom Students are: ");
+                        else
+                            PrintLineBlue_(" Bottom Student is: ");
+                        foreach (var item in queryMin)
+                        {
+                            Console.WriteLine($" GPA of {item.gpa}: {item.stdName}");
+                        }
+                    }                    
+                }               
             }
-            
-            int maxGrade = stdGradesList.Max(x => x.assignmentGrade);  // Filter the best Student and their Assignment's Names and Grades. Syntax 1:
-            IEnumerable<Tools> queryMax = from stdName in stdGradesList
-                                                        where stdName.assignmentGrade.Equals(maxGrade)
-                                                        select stdName;            
-            List<string> stdKey = new List<string>();
-
-            foreach (Tools item in queryMax)
+            catch
             {
-                stdKey.Add(item.stdName);
-            }
-            Console.ResetColor();
-
-            int stdIndex;
-            foreach (var a in stdKey)
-            {
-                stdIndex = classrooms[classIndex].students.FindIndex(x => x.studName == a);
-                IndividualStdStats(classIndex, stdIndex);
-            }
-            */
-
-
-
-            // Information already provided above. This is just another way to do it
-            /*
-            classAvgGrade = (double)classGradesTotal / assignmentsPerClass;
-
-            Console.Write(" Classroom size: "); 
-            ColorChangeToBlue();
-            Console.WriteLine($"{stdCount} Students.");
-            Console.ResetColor();
-            Console.Write(" Total number of assignments: ");
-            ColorChangeToBlue();
-            Console.WriteLine(assignmentsPerClass);
-            Console.ResetColor(); 
-            if (assignmentsPerClass == 0)
-            {                
-                Console.Write(" Average Classroom grade: ");
-                ColorChangeToBlue();
-                Console.WriteLine("Cannot be calculated.");
-                Console.ResetColor();
-            } else
-            {
-                Console.Write($" Average Classroom grade: ");
-                ColorChangeToBlue();
-                Console.WriteLine(classAvgGrade);
-                Console.ResetColor();
-            }*/
+                PrintRed__(" There are no assignments for any student or there are no students assigned to the class.");
+                maxGPA = 0;
+            }                      
         }
         public static Tuple<string, int, int, string> SecondIndividualClassStats(int classIndex)
         {
@@ -278,26 +223,7 @@ namespace Lab2
                 gpa = ClassAvgGPAStats(classIndex);
             }
             return new Tuple<string, int, int, string>(className, stdCount, assignmentsPerClass, gpa);
-        }
-        /*public static Tuple<string, int, int, string> SecondIndividualStdStats(int classIndex, int stdIndex)
-        {
-            string stdName = classrooms[classIndex].students[stdIndex].studName;
-            int stdAssignmentCount = classrooms[classIndex].students[stdIndex].assignments.Count;
-            int stdID = classrooms[classIndex].students[stdIndex].studID;
-            int assignmentsPerClass = 0;
-            double stdGPA = StdGPACalc(classIndex, stdIndex);
-
-            for (int j = 0; j < stdCount; j++)
-            {
-                assignmentsPerClass += classrooms[classIndex].students[j].assignments.Count;
-            }
-
-            foreach (var classroom in classrooms.Where(x => x.classID.Equals(classIndex + 1)))
-            {
-                gpa = ClassAvgGPAStats(classIndex);
-            }
-            return new Tuple<string, int, int, string>(className, stdCount, assignmentsPerClass, gpa);
-        }*/
+        }        
         public static string ClassAvgGPAStats(int classIndex)
         {
             int stdCount = classrooms[classIndex].students.Count;
@@ -353,6 +279,27 @@ namespace Lab2
                 return 1;
             }
         }
+        public static int FindNextAvailableAssignmentID(int classIndex, int stdIndex)
+        {
+            try
+            {
+                return classrooms[classIndex].students[stdIndex].assignments.Max(x => x.assignmentID) + 1;
+            }
+            catch
+            {
+                return 1;
+            }
+        }
+        public static void ColorChangeToBlue()
+        {
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.ForegroundColor = ConsoleColor.Blue;
+        }
+        public static void ColorChangeToRed()
+        {
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.ForegroundColor = ConsoleColor.Red;
+        }
         public static void PrintBlue_(string a)
         {
             ColorChangeToBlue();
@@ -362,30 +309,6 @@ namespace Lab2
         public static void PrintRed__(string a)
         {
             ColorChangeToRed();
-            Console.Write(a);
-            Console.ResetColor();
-        }
-        public static void PrintWhite(string a)
-        {
-            Console.ResetColor();
-            Console.Write(a);
-            Console.ResetColor();
-        }
-        public static void PrintBlue_(int a)
-        {
-            ColorChangeToBlue();
-            Console.Write(a);
-            Console.ResetColor();
-        }
-        public static void PrintRed__(int a)
-        {
-            ColorChangeToRed();
-            Console.Write(a);
-            Console.ResetColor();
-        }
-        public static void PrintWhite(int a)
-        {
-            Console.ResetColor();
             Console.Write(a);
             Console.ResetColor();
         }
@@ -401,12 +324,6 @@ namespace Lab2
             Console.Write(a);
             Console.ResetColor();
         }
-        public static void PrintWhite(double a)
-        {
-            Console.ResetColor();
-            Console.Write(a);
-            Console.ResetColor();
-        }
         public static void PrintLineBlue_(string a)
         {
             ColorChangeToBlue();
@@ -416,12 +333,6 @@ namespace Lab2
         public static void PrintLineRed__(string a)
         {
             ColorChangeToRed();
-            Console.WriteLine(a);
-            Console.ResetColor();
-        }
-        public static void PrintLineWhite(string a)
-        {
-            Console.ResetColor();
             Console.WriteLine(a);
             Console.ResetColor();
         }
@@ -437,12 +348,6 @@ namespace Lab2
             Console.WriteLine(a);
             Console.ResetColor();
         }
-        public static void PrintLineWhite(int a)
-        {
-            Console.ResetColor();
-            Console.WriteLine(a);
-            Console.ResetColor();
-        }
         public static void PrintLineBlue_(double a)
         {
             ColorChangeToBlue();
@@ -452,12 +357,6 @@ namespace Lab2
         public static void PrintLineRed__(double a)
         {
             ColorChangeToRed();
-            Console.WriteLine(a);
-            Console.ResetColor();
-        }
-        public static void PrintLineWhite(double a)
-        {
-            Console.ResetColor();
             Console.WriteLine(a);
             Console.ResetColor();
         }

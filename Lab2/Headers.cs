@@ -34,41 +34,45 @@ namespace Lab2
         public static void ClassSubHeader()
         {
             PrintLineBlue_(" ID       Student Name        Assignments       Avg GPA");
-            PrintLineWhite("********************************************************");
+            Console.WriteLine("********************************************************");
+        }
+        public static void AssignmentHeader()
+        {
+            PrintLineBlue_(" ID       Assignment Name        Grade       Status");
+            Console.WriteLine("********************************************************");
         }
         public static void ClassSubMenuHeader(string className, int stdAssigned, int numOfAssignments, string gpa)
         {
             ColorChangeToRed();
             PrintLineRed__($"\n === {className.ToUpper()} === ");
             PrintBlue_($"      Students: ");
-            PrintWhite(stdAssigned);
+            Console.Write(stdAssigned);
             PrintBlue_($"      Assignments: ");
-            PrintWhite(numOfAssignments);
+            Console.Write(numOfAssignments);
             PrintBlue_($"      Avg GPA: ");
             Console.WriteLine(gpa);
-            PrintLineWhite("********************************************************");
+            Console.WriteLine("********************************************************");
         }
         public static void ClassSubMenuHeader(string className)
         {
-            ColorChangeToRed();
             PrintLineRed__($"\n === {className.ToUpper()} === ");
-            PrintLineWhite("********************************************************");
+            Console.WriteLine("********************************************************");
         }
-        public static void StdSubMenuHeader(int classIndex, int stdIndex)
+        public static void StdSubMenuHeader(int classIndex, int stdIndex, string gpa)
         {
             string className = classrooms[classIndex].className.ToUpper();
             string stdName = classrooms[classIndex].students[stdIndex].studName.ToUpper();
-            className = "=== " + className + " ===";
-            stdName = "=== " + stdName + " ===";
-            ColorChangeToRed();
-            Console.WriteLine(string.Format(" {0,-1}{1,42}", className, stdName));
-            PrintLineWhite("********************************************************");
+            className = "== " + className + " ==";
+            stdName = "== " + stdName + " ==";
+            PrintRed__($"{className}");
+            Console.Write($"      GPA: ");
+            Console.Write(gpa);
+            PrintLineRed__($"     {stdName}");
+            Console.WriteLine("********************************************************");
         }
-        public static void StdMenuHeader(string stdName)
+        public static void StdMenuHeader()
         {
-            ColorChangeToRed();
-            Console.WriteLine("\n                     {0}", stdName);
-            Console.ResetColor();
+            PrintLineBlue_(" ID      Assignment Name         Grade        Status");
             Console.WriteLine("********************************************************");
         }
         public static void StudentHeaderWithoutID()
