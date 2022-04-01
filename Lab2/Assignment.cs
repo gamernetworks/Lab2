@@ -7,6 +7,7 @@ using static Lab2.GlobalVariables;
 using static Lab2.Assignment;
 using static Lab2.Tools;
 using static Lab2.Headers;
+using static Lab2.Student;
 using System.Globalization;
 
 namespace Lab2
@@ -72,83 +73,57 @@ namespace Lab2
                 assignmentCompleteness = false;
             }
         }
-        public static void ViewAssignment(int classIndex, int stdIndex)
+        public static int ViewStdAssignments(int classIndex, int stdIndex, int elementUpdatingIndex)
         {
-            int stdIndexHelper = 0;
-
-            if (classrooms[classIndex].students[stdIndex].assignments.Count <= 0)
-            {
-                PrintLineRed__("\n There are no assignments for this student.");                
+            // Menu containing the student's class name, her/his name and GPA
+            StdMenuHeader(classIndex, stdIndex, StdGPACalc(classIndex, stdIndex).ToString());            
+            if (classrooms[classIndex].students[stdIndex].assignments.Count <= 0 && elementUpdatingIndex == -1)
+            {   // Returns the message below if student has no assignments
+                PrintLineRed__("\n There are no assignments for this student."); return 0;
             } else
-            {
-                StdMenuHeader();
+            {   // Otherwise, print the stundets assignment ID, name, grade and status and highlight what's being updated
                 foreach (var classroom in classrooms[classIndex].students[stdIndex].assignments)
                 {
-                    Console.WriteLine(string.Format(" {0,-11}{1,-22}{2,-12}{3,-13}",
-                        classroom.assignmentID, classroom.assignmentName, classroom.assignmentGrade, classroom.assignmentStatus));
-                    stdIndexHelper++;
+                    if (classroom.assignmentID == elementUpdatingIndex)
+                    {
+                        PrintLineRed__(string.Format(" {0,-11}{1,-22}{2,-12}{3,-13}",
+                            classroom.assignmentID, classroom.assignmentName, classroom.assignmentGrade, classroom.assignmentStatus));
+                    }
+                    else
+                    {
+                        Console.WriteLine(string.Format(" {0,-11}{1,-22}{2,-12}{3,-13}",
+                            classroom.assignmentID, classroom.assignmentName, classroom.assignmentGrade, classroom.assignmentStatus));
+                    }
                 }
-                stdIndexHelper = 0;
             }
+            return 0;
         }
         public static int AddAssignment(int classIndex, int stdIndex)
         {
-            string stdName = classrooms[classIndex].students[stdIndex].studName;
-            int stdIndexHelper = 0;
             string addGrade;
-            int newGrade =0;
+            int newGrade = 0;
             int assignmentIndex = 0;
-
-            Console.Clear();
-            var a = SecondIndividualClassStats(classIndex);
-            StdSubMenuHeader(classIndex, stdIndex, StdGPACalc(classIndex, stdIndex).ToString());
-            ClassSubHeader();
-            foreach (var classroom in classrooms[classIndex].students[stdIndex].assignments)
-            {
-                Console.WriteLine(string.Format(" {0,-9}{1,-25}{2,-15}{3,-13}",
-                    classroom.assignmentID, classroom.assignmentName, classroom.assignmentGrade, classroom.assignmentStatus,
-                    StdGPACalc(classIndex, stdIndex)));
-                stdIndexHelper++;
-            }
-            stdIndexHelper = 0;
-
             int newAssignmentID = FindNextAvailableAssignmentID(classIndex, stdIndex);
 
+            // Menu with all student's details
+            ViewStdAssignments(classIndex, stdIndex, -1); // Use -1 when no highlights are necessary
             PrintBlue_("\n Enter the name of the new Assignment: ");
-            string newAssignmentName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(Console.ReadLine().ToLower());
-;
+            string newAssignmentName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(Console.ReadLine().ToLower());;
+            // Adds the new assignment to the students list of assignments.
             classrooms[classIndex].students[stdIndex].assignments.Add(new Assignment(newAssignmentID, newAssignmentName));
+            // Fetch the new assignment Index
             assignmentIndex = classrooms[classIndex].students[stdIndex].assignments.FindIndex(x => x.assignmentID == newAssignmentID);
-
-            Console.Clear();
-            StdSubMenuHeader(classIndex, stdIndex, StdGPACalc(classIndex, stdIndex).ToString());///
-            ClassSubHeader();
-            
-            foreach (var classroom in classrooms[classIndex].students[stdIndex].assignments)
-            {
-                if (classroom.assignmentID != newAssignmentID)
-                {
-                    Console.WriteLine(string.Format(" {0,-9}{1,-25}{2,-15}{3,-13}",
-                    classroom.assignmentID, classroom.assignmentName, classroom.assignmentGrade, classroom.assignmentStatus,
-                    StdGPACalc(classIndex, stdIndex)));
-                    stdIndexHelper++;
-                }
-                else
-                {
-                    PrintLineRed__(string.Format(" {0,-9}{1,-25}{2,-15}{3,-13}",
-                    classroom.assignmentID, classroom.assignmentName, classroom.assignmentGrade, classroom.assignmentStatus,
-                    StdGPACalc(classIndex, stdIndex)));
-                    stdIndexHelper++;
-                }
-            }
-            stdIndexHelper = 0;
+            // Menu with all student's details after the addition. It will all show the new assignment highlighted red
+            ViewStdAssignments(classIndex, stdIndex, newAssignmentID);
             PrintLineRed__("\n Assignment added successfully!");
+
+            // Asks the user if he/she wants to add a grade to the new assignment
             Console.WriteLine("\n Would you like to add a grade to the new Assignment?");
             do
             {
                 PrintBlue_(" Type \"Yes\" to proceed or \"No\" to Cancel: ");
                 addGrade = Console.ReadLine().ToLower();
-                if (addGrade == "yes")
+                if (addGrade == "yes") // User wants to add a grade to the new assignment
                 {
                     do
                     {
@@ -156,41 +131,25 @@ namespace Lab2
                         {
                             PrintBlue_("\n Please enter a grade: ");
                             newGrade = int.Parse(Console.ReadLine());
+                            // Checks if the grade provided is valid (0 to 100)
                             classrooms[classIndex].students[stdIndex].assignments[assignmentIndex].assignmentGrade = newGrade;
-                            if (newGrade < 0 || newGrade > 100)
+                            if (newGrade < 0 || newGrade > 100) // If grade is not within the paramenters...
                             {
                                 PrintLineRed__(" You have entered an invalid entry.\n Please enter a number between 0 and 100.");
-                            } else                            
+                            } else // Otherwise...
                             {
+                                // Marks the newly added assignment complete, even if the grade is 0.
                                 classrooms[classIndex].students[stdIndex].assignments[assignmentIndex].assignmentStatus = "Complete";
-                                Console.Clear();
-                                stdIndexHelper = 0;
-                                StdSubMenuHeader(classIndex, stdIndex, StdGPACalc(classIndex, stdIndex).ToString());///
-                                ClassSubHeader();
-                                foreach (var classroom in classrooms[classIndex].students[stdIndex].assignments)
-                                {
-                                    if (classroom.assignmentID != newAssignmentID)
-                                    {
-                                        Console.WriteLine(string.Format(" {0,-9}{1,-25}{2,-15}{3,-13}",
-                                        classroom.assignmentID, classroom.assignmentName, classroom.assignmentGrade, classroom.assignmentStatus,
-                                        StdGPACalc(classIndex, stdIndex)));
-                                        stdIndexHelper++;
-                                    }
-                                    else
-                                    {
-                                        PrintRed__(string.Format(" {0,-9}{1,-25}{2,-15}{3,-13}",
-                                        classroom.assignmentID, classroom.assignmentName, classroom.assignmentGrade, classroom.assignmentStatus,
-                                        StdGPACalc(classIndex, stdIndex)));
-                                        stdIndexHelper++;
-                                    }
-                                }                                
-                                PrintLineRed__("\n\n Grade successfully added!");
+                                // Menu with all student's details after the addition. It will all show the new assignment highlighted red
+                                ViewStdAssignments(classIndex, stdIndex, newAssignmentID);                        
+                                PrintLineBlue_("\n\n Grade successfully added!");
                                 Console.WriteLine(" Press any key to continue.");
                                 Console.ReadKey();
                             }                            
                         }
                         catch
                         {
+                            // Error if the user enters anything than the accepted parameters...to include characters
                             PrintLineRed__(" You have entered an invalid entry.\n Please enter a number between 0 and 100.");
                         }
                     } while (newGrade < 0 || newGrade > 100);
@@ -205,302 +164,142 @@ namespace Lab2
             } while (addGrade != "yes" || addGrade != "no");
             return 0;
         }
-        public static int AddEditGrade(int classIndex, int stdIndex)
+        public static int AddEditAssignmentGrade(int classIndex, int stdIndex)
         {
-            string stdName = classrooms[classIndex].students[stdIndex].studName;
-            int stdIndexHelper = 0;
             int newGrade = 0;
-
-            Console.Clear();
-            var a = SecondIndividualClassStats(classIndex);
-            StdSubMenuHeader(classIndex, stdIndex, StdGPACalc(classIndex, stdIndex).ToString());
-            ViewAssignment(classIndex, stdIndex);
-
+            int assignmentIndex = 0;
+            int assignmentID;
+                        
+            ViewStdAssignments(classIndex, stdIndex, -1); // Menu with all student's details. Use -1 when highlights are not necessary
             if (classrooms[classIndex].students[stdIndex].assignments.Count <= 0)
-            {
-                PrintLineRed__(" Press any key to continue.");
-                Console.ReadKey();
-                return 0;
+            {   // Returns the user to the previous menu as there are no assignments to grade/edit
+                PrintLineRed__(" Press any key to continue."); Console.ReadKey(); return 0;
             }
-
-            Console.Clear();
-            StdSubMenuHeader(classIndex, stdIndex, StdGPACalc(classIndex, stdIndex).ToString());
-            ViewAssignment(classIndex, stdIndex);
             PrintLineRed__("\n Type \"Q\" to cancel this operation. ");
             PrintBlue_(" Enter the Assignment's name or ID number: ");
+            // Takes the user's input (the assignment's name or ID) to find the assignment to be graded
             string assignmentName = Console.ReadLine().ToLower();
-            int index = classrooms[classIndex].students[stdIndex].assignments.FindIndex(x => x.assignmentName.ToLower() == assignmentName);
-
-            if (assignmentName == "q")
-            {
-                return 0; // mainMenuSelection to cancel operation
-            }
-
+            // Quits this method if the user wants to by typing "q"
+            if (assignmentName == "q") { return 0; }
+            // Tests if the user's input can be converted into a digit 
             bool indexTest = assignmentName.All(char.IsDigit);
-            if (indexTest == false)
+            // This allows the use of either the assignment ID or its name
+            if (indexTest == true)
             {
-                int assignmentNameIndex = classrooms[classIndex].students[stdIndex].assignments.FindIndex(x => x.assignmentName.ToLower() == assignmentName);
-                if (assignmentNameIndex == -1)
+                assignmentIndex = classrooms[classIndex].students[stdIndex].assignments.FindIndex(x => x.assignmentID == int.Parse(assignmentName));
+            } else
+            {
+                assignmentIndex = classrooms[classIndex].students[stdIndex].assignments.FindIndex(x => x.assignmentName.ToLower() == assignmentName);
+            }
+            // If the index of the assignment input from the user is incorrect, this method will restart
+            if (assignmentIndex == -1)
+            {
+                PrintLineRed__(" You have entered an invalid name or ID. \n Press any key and try again."); Console.ReadKey(); return 4;
+            }
+            else // If the assignment exists, then...
+            {
+                // Get the assignment ID to highlight it on the page
+                assignmentID = classrooms[classIndex].students[stdIndex].assignments[assignmentIndex].assignmentID;
+                // Menu with all student's details after the addition. It will all show the new assignment highlighted red
+                ViewStdAssignments(classIndex, stdIndex, assignmentID);
+                do
                 {
-                    PrintLineRed__(" You have entered an invalid name or ID. \n Press any key and try again.");
-                    Console.ReadKey();
-                    return 4; // classMainMenuSelection
-                }
-                else
-                {
-                    assignmentName = classrooms[classIndex].students[stdIndex].assignments[assignmentNameIndex].assignmentName;
-                    Console.Clear();
-                    Console.Clear();
-                    StdSubMenuHeader(classIndex, stdIndex, StdGPACalc(classIndex, stdIndex).ToString());
-                    ViewAssignment(classIndex, stdIndex);
-                    do
+                    try
                     {
-                        try
-                        {
-                            PrintBlue_("\n Please enter a grade: ");
-                            newGrade = int.Parse(Console.ReadLine());
-                            classrooms[classIndex].students[stdIndex].assignments[assignmentNameIndex].assignmentGrade = newGrade;
-                            if (newGrade < 0 || newGrade > 100)
-                            {
-                                PrintLineRed__(" You have entered an invalid entry.\n Please enter a number between 0 and 100.");
-                            }
-                            else
-                            {
-                                classrooms[classIndex].students[stdIndex].assignments[assignmentNameIndex].assignmentStatus = "Complete";
-                                Console.Clear();
-                                stdIndexHelper = 0;
-                                StdSubMenuHeader(classIndex, stdIndex, StdGPACalc(classIndex, stdIndex).ToString());///
-                                ClassSubHeader();
-                                foreach (var classroom in classrooms[classIndex].students[stdIndex].assignments)
-                                {
-                                    if (classroom.assignmentGrade != newGrade)
-                                    {
-                                        Console.WriteLine(string.Format(" {0,-9}{1,-25}{2,-15}{3,-13}",
-                                        classroom.assignmentID, classroom.assignmentName, classroom.assignmentGrade, classroom.assignmentStatus,
-                                        StdGPACalc(classIndex, stdIndex)));
-                                        stdIndexHelper++;
-                                    }
-                                    else
-                                    {
-                                        PrintRed__(string.Format(" {0,-9}{1,-25}{2,-15}{3,-13}",
-                                        classroom.assignmentID, classroom.assignmentName, classroom.assignmentGrade, classroom.assignmentStatus,
-                                        StdGPACalc(classIndex, stdIndex)));
-                                        stdIndexHelper++;
-                                    }
-                                }
-                                PrintLineRed__("\n\n Grade successfully edited/added!");
-                                Console.WriteLine(" Press any key to continue.");
-                                Console.ReadKey();
-                            }
-                        }
-                        catch
+                        PrintBlue_("\n Please enter a grade: ");
+                        newGrade = int.Parse(Console.ReadLine());
+                        // If the grade its outside the paremeters, repeat this block of code
+                        if (newGrade < 0 || newGrade > 100)
                         {
                             PrintLineRed__(" You have entered an invalid entry.\n Please enter a number between 0 and 100.");
                         }
-                    } while (newGrade < 0 || newGrade > 100);
-                    return 0;
-                }
-            }
-            else
-            {
-                int assignmentIDIndex = classrooms[classIndex].students[stdIndex].assignments.FindIndex(x => x.assignmentID == int.Parse(assignmentName));
-                if (assignmentIDIndex == -1)
-                {
-                    PrintLineRed__(" You have entered an invalid name or ID. \n Press any key and try again.");
-                    Console.ReadKey();
-                    return 4; // classMainMenuSelection
-                }
-                else
-                {
-                    assignmentName = classrooms[classIndex].students[stdIndex].assignments[assignmentIDIndex].assignmentName;
-                    Console.Clear();
-                    Console.Clear();
-                    StdSubMenuHeader(classIndex, stdIndex, StdGPACalc(classIndex, stdIndex).ToString());
-                    ViewAssignment(classIndex, stdIndex);
-                    do
+                        else
+                        {
+                            // Adds new grade to the selected assignment 
+                            classrooms[classIndex].students[stdIndex].assignments[assignmentIndex].assignmentGrade = newGrade;
+                            // Sets the selected assignment status to complete
+                            classrooms[classIndex].students[stdIndex].assignments[assignmentIndex].assignmentStatus = "Complete";
+                            // Menu with all student's details after the addition. It will all show the new assignment highlighted red
+                            ViewStdAssignments(classIndex, stdIndex, assignmentID);
+                            PrintLineRed__("\n\n Grade successfully edited/added!");
+                            Console.WriteLine(" Press any key to continue.");
+                            Console.ReadKey();
+                        }
+                    }
+                    catch
                     {
-                        try
-                        {
-                            PrintBlue_("\n Please enter a grade: ");
-                            newGrade = int.Parse(Console.ReadLine());
-                            classrooms[classIndex].students[stdIndex].assignments[assignmentIDIndex].assignmentGrade = newGrade;
-                            if (newGrade < 0 || newGrade > 100)
-                            {
-                                PrintLineRed__(" You have entered an invalid entry.\n Please enter a number between 0 and 100.");
-                            }
-                            else
-                            {
-                                classrooms[classIndex].students[stdIndex].assignments[assignmentIDIndex].assignmentStatus = "Complete";
-                                Console.Clear();
-                                stdIndexHelper = 0;
-                                StdSubMenuHeader(classIndex, stdIndex, StdGPACalc(classIndex, stdIndex).ToString());///
-                                ClassSubHeader();
-                                foreach (var classroom in classrooms[classIndex].students[stdIndex].assignments)
-                                {
-                                    if (classroom.assignmentGrade != newGrade)
-                                    {
-                                        Console.WriteLine(string.Format(" {0,-9}{1,-25}{2,-15}{3,-13}",
-                                        classroom.assignmentID, classroom.assignmentName, classroom.assignmentGrade, classroom.assignmentStatus,
-                                        StdGPACalc(classIndex, stdIndex)));
-                                        stdIndexHelper++;
-                                    }
-                                    else
-                                    {
-                                        PrintRed__(string.Format(" {0,-9}{1,-25}{2,-15}{3,-13}",
-                                        classroom.assignmentID, classroom.assignmentName, classroom.assignmentGrade, classroom.assignmentStatus,
-                                        StdGPACalc(classIndex, stdIndex)));
-                                        stdIndexHelper++;
-                                    }
-                                }
-                                PrintLineRed__("\n\n Grade successfully edited/added!");
-                                Console.WriteLine(" Press any key to continue.");
-                                Console.ReadKey();
-                            }
-                        }
-                        catch
-                        {
-                            PrintLineRed__(" You have entered an invalid entry.\n Please enter a number between 0 and 100.");
-                        }
-                    } while (newGrade < 0 || newGrade > 100);
-                    return 0;
-                }
-            }
+                        // Repeats the loop when the user input is incorrect
+                        PrintLineRed__(" You have entered an invalid entry.\n Please enter a number between 0 and 100.");
+                    }
+                } while (newGrade < 0 || newGrade > 100);
+                return 0;
+            }            
         }
         public static int RemoveAssignment(int classIndex, int stdIndex)
         {
-            string stdName = classrooms[classIndex].students[stdIndex].studName;
-            int stdIndexHelper = 0;
-            string deleteAssignment;
+            string assignmentName, deleteAssignment;
+            int assignmentIndex = 0, assignmentID;
 
-            Console.Clear();
-            var a = SecondIndividualClassStats(classIndex);
-            StdSubMenuHeader(classIndex, stdIndex, StdGPACalc(classIndex, stdIndex).ToString());            
-
-            ClassSubHeader();
-            foreach (var classroom in classrooms[classIndex].students[stdIndex].assignments)
-            {
-                Console.WriteLine(string.Format(" {0,-9}{1,-25}{2,-15}{3,-13}",
-                    classroom.assignmentID, classroom.assignmentName, classroom.assignmentGrade, classroom.assignmentStatus,
-                    StdGPACalc(classIndex, stdIndex)));
-                stdIndexHelper++;
-            }
-            stdIndexHelper = 0;
+            ViewStdAssignments(classIndex, stdIndex, -1); // Menu with all student's details. Use -1 when highlights are not necessary
+            // Returns the user to the previous menu as there are no assignments to grade/edit. Otherwise, continue with adding/editing method
             if (classrooms[classIndex].students[stdIndex].assignments.Count <= 0)
             {
-                PrintLineRed__("\n There are no assignment for this student. \n Press any key to continue.");
-                Console.ReadKey();
-                return 0;
-            }
-
-            int newAssignmentID = FindNextAvailableAssignmentID(classIndex, stdIndex);
-
+                PrintLineRed__(" Press any key to continue."); Console.ReadKey(); return 0;
+            }            
             PrintLineRed__("\n Type \"Q\" to cancel this operation.");
             PrintBlue_(" Enter the Assignment name or ID number: ");
-            string assignmentName = Console.ReadLine().Trim().ToLower();
-
-            if (assignmentName == "q")
-            {
-                return 0; // mainMenuSelection to cancel operation
-            }
-
+            // Takes the user's input (the assignment's name or ID) to find the assignment to be graded
+            assignmentName = Console.ReadLine().ToLower();
+            // Quits this method if the user wants to by typing "q"
+            if (assignmentName == "q") { return 0; }
+            // Tests if the user's input can be converted into a digit 
             bool indexTest = assignmentName.All(char.IsDigit);
-            if (indexTest == false)
-            {
-                int assignmentNameIndex = classrooms[classIndex].students[stdIndex].assignments.FindIndex(x => x.assignmentName.ToLower() == assignmentName);
-                if (assignmentNameIndex == -1)
-                {
-                    PrintLineRed__(" You have entered an invalid name or ID. \n Press any key and try again.");
-                    Console.ReadKey();
-                    return 3; // classMainMenuSelection
-                }
-                else
-                {
-                    assignmentName = classrooms[classIndex].students[stdIndex].assignments[assignmentNameIndex].assignmentName;
-                    Console.Clear();
-                    StdSubMenuHeader(classIndex, stdIndex, StdGPACalc(classIndex, stdIndex).ToString());
-                    ClassSubHeader();
-                    foreach (var classroom in classrooms[classIndex].students[stdIndex].assignments)
-                    {
-                        Console.WriteLine(string.Format(" {0,-9}{1,-25}{2,-15}{3,-13}",
-                            classroom.assignmentID, classroom.assignmentName, classroom.assignmentGrade, classroom.assignmentStatus,
-                            StdGPACalc(classIndex, stdIndex)));
-                        stdIndexHelper++;
-                    }
-                    stdIndexHelper = 0;
-                    PrintRed__("\n Are you sure you want to delete ");
-                    Console.Write(assignmentName);
-                    PrintRed__("?");
-                    do
-                    {
-                        PrintRed__("\n Type \"Yes\" to proceed or \"No\" to Cancel. ");
-                        ColorChangeToBlue();
-                        deleteAssignment = Console.ReadLine().ToLower();
-                        if (deleteAssignment == "yes")
-                        {
-                            classrooms[classIndex].students[stdIndex].assignments.RemoveAt(assignmentNameIndex);
-                            PrintRed__($"\n {assignmentName}");
-                            Console.WriteLine(" has been successfully deleted!");
-                            Console.Write(" Press any key to continue.");
-                            Console.ReadKey();
-                            return 0; // mainMenuSelection to complete operation;
-                        }
-                        else if (deleteAssignment == "no")
-                        {
-                            return 0; // mainMenuSelection to cancel operation
-                        }
-                    } while (deleteAssignment != "no" || deleteAssignment != "yes");
-                    return 0; // mainMenuSelection to complete operation
-                }
+            if (indexTest == true)
+            {   // If user entered the assignment ID number then...
+                assignmentIndex = classrooms[classIndex].students[stdIndex].assignments.FindIndex(x => x.assignmentID == int.Parse(assignmentName)); // ID
+                if (assignmentIndex == -1) // If ID is not found then try by name
+                    assignmentIndex = classrooms[classIndex].students[stdIndex].assignments.FindIndex(x => x.assignmentName.ToLower() == assignmentName);
+            } else
+            {   // If user entered the assignment name then...
+                assignmentIndex = classrooms[classIndex].students[stdIndex].assignments.FindIndex(x => x.assignmentName.ToLower() == assignmentName);
+            }
+            if (assignmentIndex == -1)
+            {   // If the user input is incorrect, this method will restart
+                PrintLineRed__(" You have entered an invalid name or ID. \n Press any key and try again."); Console.ReadKey(); return 4;
             }
             else
             {
-                int assignmentIDIndex = classrooms[classIndex].students[stdIndex].assignments.FindIndex(x => x.assignmentID == int.Parse(assignmentName));
-                if (assignmentIDIndex == -1)
+                // Get the assignment ID to highlight it on the page
+                assignmentID = classrooms[classIndex].students[stdIndex].assignments[assignmentIndex].assignmentID;
+                // Menu with all student's details after the addition. It will all show the new assignment highlighted red
+                ViewStdAssignments(classIndex, stdIndex, assignmentID);
+                // Gets the assignment to be deleted name to present it to the user 
+                assignmentName = classrooms[classIndex].students[stdIndex].assignments[assignmentIndex].assignmentName;
+                PrintRed__("\n Are you sure you want to delete ");
+                Console.Write(assignmentName);
+                PrintRed__("?");
+                do
                 {
-                    PrintLineRed__(" You have entered an invalid name or ID. \n Press any key and try again.");
-                    Console.ReadKey();
-                    return 3; // classMainMenuSelection
-                }
-                else
-                {
-                    assignmentName = classrooms[classIndex].students[stdIndex].assignments[assignmentIDIndex].assignmentName;
-                    Console.Clear();
-                    Console.Clear();
-                    StdSubMenuHeader(classIndex, stdIndex, StdGPACalc(classIndex, stdIndex).ToString());
-                    ClassSubHeader();
-                    foreach (var classroom in classrooms[classIndex].students[stdIndex].assignments)
+                    PrintRed__("\n Type \"Yes\" to proceed or \"No\" to Cancel. ");
+                    ColorChangeToBlue();
+                    deleteAssignment = Console.ReadLine().ToLower();
+                    if (deleteAssignment == "yes")
                     {
-                        Console.WriteLine(string.Format(" {0,-9}{1,-25}{2,-15}{3,-13}",
-                            classroom.assignmentID, classroom.assignmentName, classroom.assignmentGrade, classroom.assignmentStatus,
-                            StdGPACalc(classIndex, stdIndex)));
-                        stdIndexHelper++;
+                        // Removes the assignment using it's index
+                        classrooms[classIndex].students[stdIndex].assignments.RemoveAt(assignmentIndex);
+                        PrintRed__($"\n {assignmentName}");
+                        Console.WriteLine(" has been successfully deleted!");
+                        Console.Write(" Press any key to continue.");
+                        Console.ReadKey();
+                        return 0;
                     }
-                    stdIndexHelper = 0;
-                    PrintRed__("\n Are you sure you want to delete ");
-                    Console.Write(assignmentName);
-                    PrintRed__("?");
-                    do
+                    else if (deleteAssignment == "no")
                     {
-                        PrintRed__("\n Type \"Yes\" to proceed or \"No\" to Cancel. ");
-                        ColorChangeToBlue();
-                        deleteAssignment = Console.ReadLine().ToLower();
-                        if (deleteAssignment == "yes")
-                        {
-                            classrooms[classIndex].students[stdIndex].assignments.RemoveAt(assignmentIDIndex);
-                            PrintRed__($"\n {assignmentName}");
-                            Console.WriteLine(" has been successfully deleted!");
-                            Console.Write(" Press any key to continue.");
-                            Console.ReadKey();
-                            return 0; // mainMenuSelection to complete operation;
-                        }
-                        else if (deleteAssignment == "no")
-                        {
-                            return 0; // mainMenuSelection to cancel operation
-                        }
-                    } while (deleteAssignment != "no" || deleteAssignment != "yes");
-                    return 0; // mainMenuSelection to complete operation
-                }
-            }
+                        return 0;
+                    }
+                } while (deleteAssignment != "no" || deleteAssignment != "yes");
+                return 0;
+            }            
         }
     }
 }

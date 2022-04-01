@@ -60,9 +60,8 @@ namespace Lab2
             {
                 try
                 {
-                    Console.Clear();
-                    ClassMainMenuHeader();
-                    ViewAllClassroomsInfo();
+                    // View every classroom with its ID, name, std count and GPA.                    
+                    SchoolInfo(-1); // Use -1 in method to disable highlighting
                     Console.WriteLine("\n" +
                         "\n           1. Manage Classroom" +
                         "\n           2. Add New Classroom" +
@@ -120,16 +119,15 @@ namespace Lab2
             while (true)
             {
                 try
-                {
-                    Console.Clear();
-                    var a = SecondIndividualClassStats(classIndex);                    
-                    ClassSubMenuHeader(a.Item1, a.Item2, a.Item3, a.Item4);
-                    FirstIndividualClassStats(classIndex);
-                    Console.WriteLine("\n" +
-                        "\n           1. View Student Detailed Information" +
+                {                    
+                    ClassStdInfo(classIndex, -1, true); // -1 = Deactivate Highlights. true = show top/bottom stds
+                    Console.Write("\n" +
+                        "\n           1. Manage Student" +
                         "\n           2. Add New Student" +
                         "\n           3. Remove Student" +
-                        "\n           4. Compare Students. (Disabled as the information is already displayed. \n" +
+                        "\n           4. Compare Students");
+                    PrintRed__(" (Disabled: Comparison information on displayed.)");
+                    Console.WriteLine("\n" + 
                         "\n           5. Return to Previous Menu" +
                         "\n           6. Quit Application");
                     if (classSubMenuSelection < 1 || classSubMenuSelection > 6)
@@ -174,16 +172,14 @@ namespace Lab2
             }
             return true;
         }
-        public static bool StdMenu(int classIndex, int stdIndex)
+        public static int StdMenu(int classIndex, int stdIndex)
         {
             while (true)
             {
                 try
                 {
-                    Console.Clear();
-                    StdSubMenuHeader(classIndex, stdIndex, StdGPACalc(classIndex, stdIndex).ToString());
-                    ViewAssignment(classIndex, stdIndex);
-                    StdBestWorseGrades(classIndex, stdIndex);
+                    ViewStdAssignments(classIndex, stdIndex, -1); // Use -1 to deactivate highlights
+                    ViewStdBestWorseGrades(classIndex, stdIndex);
                     Console.WriteLine("\n" +
                         "\n           1. Edit Student Name" +
                         "\n           2. Add New Assignment" +
@@ -209,15 +205,13 @@ namespace Lab2
                     }
                     else if (stdMenuSelection == 4)
                     {
-                        stdMenuSelection = AddEditGrade(classIndex, stdIndex);
+                        stdMenuSelection = AddEditAssignmentGrade(classIndex, stdIndex);
                     }
                     else if (stdMenuSelection == 5)
                     {
                         stdMenuSelection = 0;
                         classSubMenuSelection = 0;
-                        mainMenuSelection = 0;
-                        //mainMenuLoop = true;
-                        break;
+                        return 0;
                     }
                     else if (stdMenuSelection == 6)
                     {
@@ -225,7 +219,8 @@ namespace Lab2
                         classSubMenuSelection = 6;
                         classMainMenuSelection = 6;
                         mainMenuSelection = 2;
-                        return mainMenuLoop = false;
+                        mainMenuLoop = false;
+                        return 6;
                     }
                 }
                 catch
@@ -233,7 +228,6 @@ namespace Lab2
                     continue;
                 }
             }
-            return true;
         }
     }
 }

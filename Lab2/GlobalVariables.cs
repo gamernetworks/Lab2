@@ -11,7 +11,7 @@ namespace Lab2
         public static List<Classroom> classrooms = new List<Classroom>();
         public static void SampleInitialData()
         {
-            /*classrooms.Add(new Classroom(1, "PE"));
+            classrooms.Add(new Classroom(1, "PE"));
             classrooms[0].students.Add(new Student(1, "Oscar", "Montalvo"));
             classrooms[0].students.Add(new Student(2, "Manuel", "Montalvo"));
 
@@ -20,7 +20,7 @@ namespace Lab2
             classrooms[1].students[0].assignments.Add(new Assignment(1, "Vocabulary", 74));
             classrooms[1].students[0].assignments.Add(new Assignment(2, "Verbs", 99));
             classrooms[1].students.Add(new Student(2, "Byron", "Montalvo"));
-            
+
             classrooms.Add(new Classroom(3, "Math"));
             classrooms[2].students.Add(new Student(1, "Emmanuel", "Montalvo"));
             classrooms[2].students[0].assignments.Add(new Assignment(1, "Sum", 50));
@@ -37,7 +37,7 @@ namespace Lab2
             classrooms[3].students[1].assignments.Add(new Assignment(1, "Plants", 100));
             classrooms[3].students.Add(new Student(3, "Jarianna", "Montalvo"));
             classrooms[3].students[2].assignments.Add(new Assignment(1, "Animals", 100));
-            classrooms[3].students[2].assignments.Add(new Assignment(2, "Plants", 95));*/
+            classrooms[3].students[2].assignments.Add(new Assignment(2, "Plants", 95));
 
             // Syntax 4: (DOES NOT WORK. It tries to add the student before creating a new Classroom
             //classrooms.Add(new Classroom("Biology", new Student("Oscar")));            
