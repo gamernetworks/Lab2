@@ -1,30 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static Lab2.GlobalVariables;
-using static Lab2.Headers;
-using static Lab2.Student;
 
 namespace Lab2
 {
     internal class Tools
     {
-        public string stdName { get; set; }
-        public string assignmentName { get; set; }
-        public int assignmentGrade { get; set; }
+        public string StdName { get; set; }
+        public string AssignmentName { get; set; }
+        public int AssignmentGrade { get; set; }
         public double gpa { get; set; }
-        public Tools(string stdName, string assignName, int assignGrade )
+        public Tools(string sName, double sGpa)
         {
-            this.stdName = stdName;
-            this.assignmentName = assignName;
-            this.assignmentGrade = assignGrade;
-        }
-        public Tools(string stdName, double stdgpa)
-        {
-            this.stdName = stdName;
-            this.gpa = stdgpa;
+            StdName = sName;
+            gpa = sGpa;
         }
         public static int ReadKeyInput()
         {
@@ -64,34 +53,11 @@ namespace Lab2
         {
             try
             {
-                return classrooms[classIndex].students[stdIndex].assignments.Max(x => x.assignmentID) + 1;
+                return classrooms[classIndex].students[stdIndex].assignments.Max(x => x.asgmtID) + 1;
             }
             catch
             {
                 return 1;
-            }
-        }
-        public static string CalcClassAvgGPA(int classIndex)
-        {
-            int stdCount = classrooms[classIndex].students.Count;
-
-            int classGradesTotal = 0;
-            int assignmentsPerClass = 0;
-            double classAvgGrade;
-
-            for (int j = 0; j < stdCount; j++) // Iterate through calass students to seek the assignment count and grades.
-            {
-                assignmentsPerClass += classrooms[classIndex].students[j].assignments.Count;
-                for (int k = 0; k < classrooms[classIndex].students[j].assignments.Count; k++)
-                    classGradesTotal += classrooms[classIndex].students[j].assignments[k].assignmentGrade;
-            }
-            classAvgGrade = (double)classGradesTotal / assignmentsPerClass;
-            if (assignmentsPerClass == 0)
-                return "N/A";
-            else
-            {
-                classAvgGrade = Math.Round(classAvgGrade, 2);
-                return classAvgGrade.ToString();
             }
         }
         public static void ColorChangeToBlue()
@@ -116,18 +82,6 @@ namespace Lab2
             Console.Write(a);
             Console.ResetColor();
         }
-        public static void PrintBlue_(double a)
-        {
-            ColorChangeToBlue();
-            Console.Write(a);
-            Console.ResetColor();
-        }
-        public static void PrintRed__(double a)
-        {
-            ColorChangeToRed();
-            Console.Write(a);
-            Console.ResetColor();
-        }
         public static void PrintLineBlue_(string a)
         {
             ColorChangeToBlue();
@@ -135,30 +89,6 @@ namespace Lab2
             Console.ResetColor();
         }
         public static void PrintLineRed__(string a)
-        {
-            ColorChangeToRed();
-            Console.WriteLine(a);
-            Console.ResetColor();
-        }
-        public static void PrintLineBlue_(int a)
-        {
-            ColorChangeToBlue();
-            Console.WriteLine(a);
-            Console.ResetColor();
-        }
-        public static void PrintLineRed__(int a)
-        {
-            ColorChangeToRed();
-            Console.WriteLine(a);
-            Console.ResetColor();
-        }
-        public static void PrintLineBlue_(double a)
-        {
-            ColorChangeToBlue();
-            Console.WriteLine(a);
-            Console.ResetColor();
-        }
-        public static void PrintLineRed__(double a)
         {
             ColorChangeToRed();
             Console.WriteLine(a);

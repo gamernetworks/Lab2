@@ -15,17 +15,14 @@ namespace Lab2
         public int classID;
         public string className;
         public List<Student> students = new List<Student>();
-        public Classroom() { }
         public Classroom(string name)
         {
             className = name;
         }
-        public Classroom(string name, Student a) : this(name) { }
         public Classroom(int ID, string name) : this(name)
         {
             classID = ID;
         }
-        public Classroom(int ID, string name, Student a) : this(ID, name) { }
         public static int SchoolInfo(int updatingElementID) // -1 = Deactivate highlights
         {
             int i = 0; // ClassAvgGPACalc Helper
@@ -244,13 +241,35 @@ namespace Lab2
                 else // Single student with highest classroom GPA                
                     PrintLineBlue_("\n Top Student is: ");                
                 foreach (var item in queryMax) // Print and student(s) with the highest GPA (including the student name
-                    Console.WriteLine($" GPA of {item.gpa}: {item.stdName}");                
+                    Console.WriteLine($" GPA of {item.gpa}: {item.StdName}");                
                 if (queryMin.Count() > 1) // If there are more than one std with the same low GPA, then...
                     PrintLineBlue_(" Bottom Students are: ");
                 else // Single student with lowest classroom GPA
                     PrintLineBlue_(" Bottom Student is: ");
                 foreach (var item in queryMin)
-                    Console.WriteLine($" GPA of {item.gpa}: {item.stdName}");
+                    Console.WriteLine($" GPA of {item.gpa}: {item.StdName}");
+            }
+        }
+        public static string CalcClassAvgGPA(int classIndex)
+        {
+            int stdCount = classrooms[classIndex].students.Count;
+            int classGradesTotal = 0;
+            int assignmentsPerClass = 0;
+            double classAvgGrade;
+
+            for (int j = 0; j < stdCount; j++) // Iterate through calass students to seek the assignment count and grades.
+            {
+                assignmentsPerClass += classrooms[classIndex].students[j].assignments.Count;
+                for (int k = 0; k < classrooms[classIndex].students[j].assignments.Count; k++)
+                    classGradesTotal += classrooms[classIndex].students[j].assignments[k].asgmtGrade;
+            }
+            classAvgGrade = (double)classGradesTotal / assignmentsPerClass;
+            if (assignmentsPerClass == 0)
+                return "N/A";
+            else
+            {
+                classAvgGrade = Math.Round(classAvgGrade, 2);
+                return classAvgGrade.ToString();
             }
         }
     }

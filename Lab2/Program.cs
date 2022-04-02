@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static Lab2.GlobalVariables;
+﻿using static Lab2.GlobalVariables;
 using static Lab2.Menus;
 
 namespace Lab2

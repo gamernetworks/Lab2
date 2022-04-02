@@ -18,27 +18,15 @@ namespace Lab2
         public string studName;
         public List<Assignment> assignments = new List<Assignment>();
         public Student() { }
-        public Student(string name) : this()
-        {
-            studName = name;
-        }
         public Student(string firstName, string lastName) : this()
         {
             studFirstName = firstName;
             studLastName = lastName;
             studName = firstName + " " + lastName;
         }
-        public Student(string firstName, string lastName, Assignment a) : this(firstName, lastName)
-        {
-            studName = firstName + " " + lastName;
-        }
         public Student(int ID, string firstName, string lastName) : this(firstName, lastName)
         {
             studID = ID;
-            studName = firstName + " " + lastName;
-        }
-        public Student(int ID, string firstName, string lastName, Assignment a) : this(ID, firstName, lastName)
-        {
             studName = firstName + " " + lastName;
         }
         public static int StdInfo(int classIndex, int updatingElementID, bool viewTopBottomStd) // -1 = Deactivate highlights. True/false = View Top/Bottom Std
@@ -237,7 +225,7 @@ namespace Lab2
 
             assignmentsPerStd = classrooms[classIndex].students[stdIndex].assignments.Count;
             for (int i = 0; i < assignmentsPerStd; i++) // Iterates through all std's assignments in class and adds the grades
-                stdGradesTotal += classrooms[classIndex].students[stdIndex].assignments[i].assignmentGrade;
+                stdGradesTotal += classrooms[classIndex].students[stdIndex].assignments[i].asgmtGrade;
             stdAvgGrade = (double)stdGradesTotal / assignmentsPerStd; // Calculates the Std GPA
             stdAvgGrade = Math.Round(stdAvgGrade, 2); // Rounds the GPA to 2 decimals
             if (assignmentsPerStd == 0) // If there are no assignments for student....
@@ -253,7 +241,7 @@ namespace Lab2
 
             try
             {   // Tries to obtain the Std best grade. If it fails the catch the ex
-                maxGrade = classrooms[classIndex].students[stdIndex].assignments.Max(x => x.assignmentGrade);
+                maxGrade = classrooms[classIndex].students[stdIndex].assignments.Max(x => x.asgmtGrade);
                 PrintLineRed__($"\n Best Grade is: {maxGrade}");
             }
             catch
@@ -262,7 +250,7 @@ namespace Lab2
             }
             try
             {   // Tries to obtain the Std worse grade. If it fails the catch the ex
-                minGrade = classrooms[classIndex].students[stdIndex].assignments.Min(x => x.assignmentGrade);
+                minGrade = classrooms[classIndex].students[stdIndex].assignments.Min(x => x.asgmtGrade);
                 PrintLineRed__($" Worse Grade is: {minGrade}");
             }
             catch
