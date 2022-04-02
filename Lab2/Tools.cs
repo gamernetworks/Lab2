@@ -30,17 +30,13 @@ namespace Lab2
         {
             int selectionResult;
             var selectionInput = Console.ReadKey(); // Takes a Key Input from User
+
             if (char.IsDigit(selectionInput.KeyChar))
-            {
-                // If the KeyInput can be converted into an int, then:
+            {   // If the KeyInput can be converted into an int, then:
                 selectionResult = int.Parse(selectionInput.KeyChar.ToString());
                 return selectionResult;
-            }
-            else
-            {
-                // If input cannot be converted into int then return 0
+            } else // If input cannot be converted into int then return 0
                 return 0;
-            }
         }
         public static int FindNextAvailableClassID()
         {
@@ -75,7 +71,7 @@ namespace Lab2
                 return 1;
             }
         }
-        public static string ClassAvgGPACalc(int classIndex)
+        public static string CalcClassAvgGPA(int classIndex)
         {
             int stdCount = classrooms[classIndex].students.Count;
 

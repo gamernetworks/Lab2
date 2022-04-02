@@ -2,15 +2,11 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static Lab2.Tools;
 using static Lab2.GlobalVariables;
 using static Lab2.Headers;
 using static Lab2.Classroom;
-using static Lab2.Assignment;
-using static Lab2.Student;
-using static Lab2.Menus;
+
 
 namespace Lab2
 {
@@ -45,7 +41,7 @@ namespace Lab2
         {
             studName = firstName + " " + lastName;
         }
-        public static int ClassStdInfo(int classIndex, int updatingElementID, bool viewTopBottomStd) // -1 = Deactivate highlights. True/false = View Top/Bottom Std
+        public static int StdInfo(int classIndex, int updatingElementID, bool viewTopBottomStd) // -1 = Deactivate highlights. True/false = View Top/Bottom Std
         {
             string className = classrooms[classIndex].className;
             int stdCount = classrooms[classIndex].students.Count;
@@ -58,12 +54,12 @@ namespace Lab2
                 assignmentsPerClass += classrooms[classIndex].students[j].assignments.Count;
             // Iterate to the list of students to find the class GPA
             foreach (var classroom in classrooms.Where(x => x.classID.Equals(classIndex + 1)))
-                gpa = ClassAvgGPACalc(classIndex);
+                gpa = CalcClassAvgGPA(classIndex);
             ClassSubMenuHeader(className, stdCount, assignmentsPerClass, gpa); // Print classroom top info: std count, number of assignments and class GPA
 
             if (classrooms[classIndex].students.Count <= 0 && viewTopBottomStd == false)
             {
-                PrintLineRed__("\n There are no students assigned to this classroom."); Console.ReadKey(); return 0;
+                PrintLineRed__("\n There are no students assigned to this classroom."); return 1;
             } else
             {
                 foreach (var classroom in classrooms[classIndex].students)
@@ -71,452 +67,209 @@ namespace Lab2
                     if (classroom.studID == updatingElementID)
                     {   // Displays the student info being highlighted in red
                         PrintLineRed__(string.Format(" {0,-9}{1,-25}{2,-15}{3,-13}",
-                            classroom.studID, classroom.studName, classroom.assignments.Count, StdGPACalc(classIndex, i)));
+                            classroom.studID, classroom.studName, classroom.assignments.Count, CalcStdGPA(classIndex, i)));
                         i++;
                     }
                     else
                     {   
                         Console.WriteLine(string.Format(" {0,-9}{1,-25}{2,-15}{3,-13}",
-                            classroom.studID, classroom.studName, classroom.assignments.Count, StdGPACalc(classIndex, i)));
+                            classroom.studID, classroom.studName, classroom.assignments.Count, CalcStdGPA(classIndex, i)));
                         i++;
                     }
                 }
-                ViewTopAndBottomStudent(classIndex); return 0; // Displays the class' top and bottom student
+                if (viewTopBottomStd == true)
+                    ViewTopAndBottomStudent(classIndex);
+                return 0; // Displays the class' top and bottom student
             }
         }
         public static int ManageStd(int classIndex)
         {
-            string className = classrooms[classIndex].className;
+            string stdName;
+            int stdIndex;
+            bool indexTest;
 
-            ClassStdInfo(classIndex, -1, false);
-            int stdIndex = 0;
-            ClassSubMenuHeader(className);
-            if (classrooms[classIndex].students.Count <= 0)
-            {
-                PrintLineRed__("\n There are no students in this classroom. \n Press any key to continue.");
-                Console.ReadKey();
-                return 0;
-            }
-
-            foreach (var classroom in classrooms[classIndex].students)
-            {
-                Console.WriteLine(string.Format(" {0,-9}{1,-25}{2,-15}{3,-13}",
-                    classroom.studID, classroom.studName, classroom.assignments.Count, StdGPACalc(classIndex, stdIndex)));
-                stdIndex++;
+            if (StdInfo(classIndex, -1, false) == 1)
+            {   // View Std header. If theare are no Std, quit module
+                Console.WriteLine("\n Press any key to continue"); Console.ReadKey(); return -1;
             }
             PrintLineRed__("\n Type \"Q\" to cancel this operation. ");
-            PrintBlue_(" Enter the student's name or ID number: ");
-            string index = Console.ReadLine().ToLower();
-            if (index == "q")
-            {
-                return 0; // mainMenuSelection to cancel operation
+            PrintBlue_(" Enter the student's name or ID number: ".ToUpper());
+            stdName = Console.ReadLine().ToLower();
+            if (stdName == "q") { return 0; } // Quits this method if the user enters "q"
+            indexTest = stdName.All(char.IsDigit); // Tests if the user's input can be converted into a digit
+            if (indexTest == true)
+            {   // If the user entered the std ID number then...
+                stdIndex = classrooms[classIndex].students.FindIndex(x => x.studID == int.Parse(stdName)); // Try the Std ID
+                if (stdIndex == -1) // Try the Std name if Std ID is not found
+                    stdIndex = classrooms[classIndex].students.FindIndex(x => x.studName.ToLower() == stdName);
             }
-            bool indexTest = index.All(char.IsDigit);
-            if (indexTest == false)
+            else // If the user entered the Std name then...
+                stdIndex = classrooms[classIndex].students.FindIndex(x => x.studName.ToLower() == stdName);
+            if (stdIndex == -1) // If the input from the user is incorrect, this method will restart
             {
-                int stdNameIndex = classrooms[classIndex].students.FindIndex(x => x.studName.ToLower() == index);
-                if (stdNameIndex == -1)
-                {
-                    PrintLineRed__(" You have entered an invalid name or ID. \n Press any key and try again.");
-                    Console.ReadKey();
-                    return 1; // classMainMenuSelection
-                }
-                else
-                {
-                    StdMenu(classIndex, stdNameIndex);
-                    return 0;
-                }
+                PrintLineRed__(" You have entered an invalid name or ID. \n Press any key and try again."); Console.ReadKey(); return 4;
             }
             else
-            {
-                int stdIDIndex = classrooms[classIndex].students.FindIndex(x => x.studID == int.Parse(index));
-                if (stdIDIndex == -1)
-                {
-                    PrintLineRed__(" You have entered an invalid name or ID. \n Press any key and try again.");
-                    Console.ReadKey();
-                    return 1; // classMainMenuSelection
-                }
-                else
-                {
-                    return StdMenu(classIndex, stdIDIndex);
-                }
-            }
+                return stdIndex;
         }
         public static int AddStd(int classIndex)
         {
-            string className = classrooms[classIndex].className;
+            int newStdID = FindNextAvailableStdID(classIndex); // Finds the next available Std ID
+            string newFirstName, newLastName;
 
-            Console.Clear();
-            ClassStdInfo(classIndex, -1, false);
-            int stdIndex = 0;
-            ClassSubMenuHeader(className);
-            ClassSubHeader();
-            foreach (var classroom in classrooms[classIndex].students)
-            {
-                Console.WriteLine(string.Format(" {0,-9}{1,-25}{2,-15}{3,-13}",
-                    classroom.studID, classroom.studName, classroom.assignments.Count, StdGPACalc(classIndex, stdIndex)));
-                stdIndex++;
-            }
-                        
-            PrintBlue_("\n Enter the first name of the new student: ");
-            string newFirstName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(Console.ReadLine().ToLower());
-
-            PrintBlue_(" Enter the last name of the new student: ");
-            string newLastName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(Console.ReadLine().ToLower());
-            int newStdID = FindNextAvailableStdID(classIndex);
-            classrooms[classIndex].students.Add(new Student(newStdID, newFirstName, newLastName));
-
-            Console.Clear();
-            ClassSubMenuHeader(className);
-            ClassSubHeader();
-            stdIndex = 0;
-            foreach (var classroom in classrooms[classIndex].students)
-            {
-                if (classroom.studID != newStdID)
-                {
-                    Console.WriteLine(string.Format(" {0,-9}{1,-25}{2,-15}{3,-13}",
-                    classroom.studID, classroom.studName, classroom.assignments.Count, StdGPACalc(classIndex, stdIndex)));
-                    stdIndex++;
-                }
-                else
-                {
-                    PrintLineRed__(string.Format(" {0,-9}{1,-25}{2,-15}{3,-13}",
-                    classroom.studID, classroom.studName, classroom.assignments.Count, StdGPACalc(classIndex, stdIndex)));
-                    stdIndex++;
-                }
-            }
-
-            PrintLineRed__("\n Student added successfully!");
-            Console.WriteLine(" Press any key to continue.");
-            Console.ReadKey();
-            return 0;
-        }
-        public static int EditStdName(int classIndex, int stdIndex)
-        {
-            string oldStdName;
-            string newStdName;
-            string newFirstName;
-            string newLastName;
-            int stdIndexHelper = 0;
-
-            Console.Clear();
-            StdMenuHeader(classIndex, stdIndex, StdGPACalc(classIndex, stdIndex).ToString());
-            ViewStdAssignments(classIndex, stdIndex, -1); // Use - 1 to deactivate highlights
-            // Edit Code Below...create a method
-            /*foreach (var classroom in classrooms[classIndex].students)
-            {
-                Console.WriteLine(string.Format(" {0,-9}{1,-25}{2,-15}{3,-13}",
-                    classroom.studID, classroom.studName, classroom.assignments.Count, StdGPACalc(classIndex, stdIndex)));
-                stdIndex++;
-            }*/
-            if (classrooms[classIndex].students.Count <= 0)
-            {
-                PrintLineRed__("\n There are no students in this classroom. \n Press any key to continue.");
-                Console.ReadKey();
-                return 0;
-            }
-
-            PrintBlue_("\n Enter the new first name: ");
+            StdInfo(classIndex, -1, false); // Displays the students info without the top/bottom section.
+            PrintBlue_("\n Enter the first name of the new student: ".ToUpper());
             newFirstName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(Console.ReadLine().ToLower());
-            PrintBlue_(" Enter the new last name: ");
+            PrintBlue_(" Enter the last name of the new student: ".ToUpper());
             newLastName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(Console.ReadLine().ToLower());
-            oldStdName = classrooms[classIndex].students[stdIndex].studName;
-            classrooms[classIndex].students[stdIndex].studFirstName = newFirstName;
-            classrooms[classIndex].students[stdIndex].studLastName = newLastName;
-            classrooms[classIndex].students[stdIndex].studName = newFirstName + " " + newLastName;
-            newStdName = classrooms[classIndex].students[stdIndex].studName;
-
-            Console.Clear();
-            StdMenuHeader(classIndex, stdIndex, StdGPACalc(classIndex, stdIndex).ToString());
-            AssignmentHeader();
-            foreach (var classroom in classrooms[classIndex].students[stdIndex].assignments)
-            {
-                Console.WriteLine(string.Format(" {0,-11}{1,-22}{2,-12}{3,-13}",
-                    classroom.assignmentID, classroom.assignmentName, classroom.assignmentGrade, classroom.assignmentStatus));
-                stdIndexHelper++;
-            }
-
-            stdIndexHelper = 0;
-            Console.Write($"\n Student ");
-            PrintRed__(oldStdName);
-            Console.Write(" has been successfully renamed ");
-            PrintLineRed__($"{newStdName}.");
-            Console.WriteLine(" Press any key to continue.");
-            Console.ReadKey();
-            return 0; // mainMenuSelection to complete operation              
-        }
+            classrooms[classIndex].students.Add(new Student(newStdID, newFirstName, newLastName));
+            StdInfo(classIndex, newStdID, false); // Displays the students info without the top/bottom section + highlighting the new std in red
+            PrintLineRed__("\n Student added successfully!");
+            Console.WriteLine(" Press any key to continue."); Console.ReadKey(); return 0;
+        }        
         public static int RemoveStd(int classIndex)
         {
-            string className = classrooms[classIndex].className;
+            string stdName, deleteStd;
+            int stdID = 0, stdIndex;
+            bool indexTest;
 
-            Console.Clear();
-            ClassStdInfo(classIndex, -1, false);
-            int stdIndexHelper = 0;
-            ClassSubMenuHeader(className);
-            ClassSubHeader();
-            if (classrooms[classIndex].students.Count <= 0)
-            {
-                PrintLineRed__("\n There are no students in this classroom. \n Press any key to continue.");
-                Console.ReadKey();
-                return 0;
+            if (StdInfo(classIndex, -1, false) == 1)
+            {   // View Std header. If theare are no Std, quit module
+                Console.WriteLine("\n Press any key to continue"); Console.ReadKey(); return 0;
             }
-            foreach (var classroom in classrooms[classIndex].students)
-            {
-                Console.WriteLine(string.Format(" {0,-9}{1,-25}{2,-15}{3,-13}",
-                    classroom.studID, classroom.studName, classroom.assignments.Count, StdGPACalc(classIndex, stdIndexHelper)));
-                stdIndexHelper++;
+            PrintLineRed__("\n Type \"Q\" to cancel this operation. ");
+            PrintBlue_(" Enter the student's name or ID number: ".ToUpper());
+            stdName = Console.ReadLine().ToLower();
+            if (stdName == "q") { return 0; } // Quits this method if the user enters "q"
+            indexTest = stdName.All(char.IsDigit); // Tests if the user's input can be converted into a digit
+            if (indexTest == true)
+            {   // If the user entered the std ID number then...
+                stdIndex = classrooms[classIndex].students.FindIndex(x => x.studID == int.Parse(stdName)); // Try the Std ID
+                if (stdIndex == -1) // Try the Std name if Std ID is not found
+                    stdIndex = classrooms[classIndex].students.FindIndex(x => x.studName.ToLower() == stdName);
             }
-            PrintLineRed__("\n Type \"Q\" to cancel this operation.");
-            PrintBlue_(" Enter the student's full name: ");
-            string stdName = Console.ReadLine().Trim().ToLower();
-
-            if (stdName == "q")
-            {
-                return 0; // mainMenuSelection to cancel operation
+            else
+            {   // If the user entered the Std name then...
+                stdIndex = classrooms[classIndex].students.FindIndex(x => x.studName.ToLower() == stdName);
             }
-            int stdID;
-            bool indexTest = stdName.All(char.IsDigit);
-            if (indexTest == false)
-            {
-                int stdNameIndex = classrooms[classIndex].students.FindIndex(x => x.studName.ToLower() == stdName);
-                if (stdNameIndex == -1)
-                {
-                    PrintLineRed__(" You have entered an invalid name or ID. \n Press any key and try again.");
-                    Console.ReadKey();
-                    return 3; // classMainMenuSelection
-                }
-                else
-                {
-                    stdIndexHelper = 0;
-                    stdID = classrooms[classIndex].students[stdNameIndex].studID;
-                    Console.Clear();
-                    ClassSubMenuHeader(className);
-                    ClassSubHeader();
-                    foreach (var classroom in classrooms[classIndex].students)
-                    {
-                        if (classroom.studID == stdID)
-                        {
-                            PrintLineRed__(string.Format(" {0,-9}{1,-25}{2,-15}{3,-13}",
-                            classroom.studID, classroom.studName, classroom.assignments.Count, StdGPACalc(classIndex, stdIndexHelper)));
-                            stdIndexHelper++;
-                        } else
-                        {
-                            Console.WriteLine(string.Format(" {0,-9}{1,-25}{2,-15}{3,-13}",
-                            classroom.studID, classroom.studName, classroom.assignments.Count, StdGPACalc(classIndex, stdIndexHelper)));
-                            stdIndexHelper++;
-                        }                        
-                    }
-                    stdName = classrooms[classIndex].students[stdNameIndex].studName;
-                    PrintRed__("\n Are you sure you want to delete ");
-                    Console.Write(stdName);
-                    PrintLineRed__("?");
-                    string deleteStd;
-                    do
-                    {
-                        PrintRed__(" Type \"Yes\" to proceed or \"No\" to Cancel. ");
-                        ColorChangeToBlue();
-                        deleteStd = Console.ReadLine().ToLower();
-                        if (deleteStd == "yes")
-                        {
-                            stdIndexHelper = 0;                            
-                            classrooms[classIndex].students.RemoveAt(stdNameIndex);
-                            Console.Clear();
-                            ClassSubMenuHeader(className);
-                            ClassSubHeader();
-                            foreach (var classroom in classrooms[classIndex].students)
-                            {
-                                Console.WriteLine(string.Format(" {0,-9}{1,-25}{2,-15}{3,-13}",
-                                    classroom.studID, classroom.studName, classroom.assignments.Count, StdGPACalc(classIndex, stdIndexHelper)));
-                                stdIndexHelper++;
-                            }
-                            PrintRed__($"\n {stdName}");
-                            Console.WriteLine(" has been successfully deleted!");
-                            Console.Write(" Press any key to continue.");
-                            Console.ReadKey();
-                            return 0; // mainMenuSelection to complete operation;
-                        }
-                        else if (deleteStd == "no")
-                        {
-                            return 0; // mainMenuSelection to cancel operation
-                        }
-                    } while (deleteStd != "no" || deleteStd != "yes");
-                    return 0; // mainMenuSelection to complete operation
-                }
+            if (stdIndex == -1)
+            {   // If the input from the user is incorrect, this method will restart
+                PrintLineRed__(" You have entered an invalid name or ID. \n Press any key and try again."); Console.ReadKey(); return 4;
             }
             else
             {
-                int stdIDIndex = classrooms[classIndex].students.FindIndex(x => x.studID == int.Parse(stdName));
-                if (stdIDIndex == -1)
+                stdID = classrooms[classIndex].students[stdIndex].studID; // Gets the Std ID to highlight it on the page
+                stdName = classrooms[classIndex].students[stdIndex].studName; // Get the Std name to be deleted
+                StdInfo(classIndex, stdIndex, false); // View the Std information with the Std being edited highlighted in red
+                PrintRed__("\n Are you sure you want to delete ");
+                Console.Write(stdName);
+                PrintLineRed__("?");                
+                do
                 {
-                    PrintLineRed__(" You have entered an invalid name or ID. \n Press any key and try again.");
-                    Console.ReadKey();
-                    return 3; // classMainMenuSelection
-                }
-                else
-                {
-                    stdIndexHelper = 0;
-                    stdID = classrooms[classIndex].students[stdIDIndex].studID;
-                    Console.Clear();
-                    ClassSubMenuHeader(className);
-                    ClassSubHeader();
-                    foreach (var classroom in classrooms[classIndex].students)
+                    PrintRed__(" Type \"Yes\" to proceed or \"No\" to Cancel. ");
+                    ColorChangeToBlue();
+                    deleteStd = Console.ReadLine().ToLower();
+                    if (deleteStd == "yes")
                     {
-                        if (classroom.studID == stdID)
-                        {
-                            PrintLineRed__(string.Format(" {0,-9}{1,-25}{2,-15}{3,-13}",
-                            classroom.studID, classroom.studName, classroom.assignments.Count, StdGPACalc(classIndex, stdIndexHelper)));
-                            stdIndexHelper++;
-                        }
-                        else
-                        {
-                            Console.WriteLine(string.Format(" {0,-9}{1,-25}{2,-15}{3,-13}",
-                            classroom.studID, classroom.studName, classroom.assignments.Count, StdGPACalc(classIndex, stdIndexHelper)));
-                            stdIndexHelper++;
-                        }
-                    }
-                    stdName = classrooms[classIndex].students[stdIDIndex].studName;
-                    PrintRed__("\n Are you sure you want to delete ");
-                    Console.Write(stdName);
-                    PrintLineRed__("?");
-                    string deleteStd;
-                    do
-                    {
-                        PrintRed__(" Type \"Yes\" to proceed or \"No\" to Cancel. ");
-                        ColorChangeToBlue();
-                        deleteStd = Console.ReadLine().ToLower();
-                        if (deleteStd == "yes")
-                        {
-                            stdIndexHelper = 0;
-                            classrooms[classIndex].students.RemoveAt(stdIDIndex);
-                            Console.Clear();
-                            ClassSubMenuHeader(className);
-                            ClassSubHeader();
-                            foreach (var classroom in classrooms[classIndex].students)
-                            {
-                                Console.WriteLine(string.Format(" {0,-9}{1,-25}{2,-15}{3,-13}",
-                                    classroom.studID, classroom.studName, classroom.assignments.Count, StdGPACalc(classIndex, stdIndexHelper)));
-                                stdIndexHelper++;
-                            }
-                            PrintRed__($"\n {stdName}");
-                            Console.WriteLine(" has been successfully deleted!");
-                            Console.Write(" Press any key to continue.");
-                            Console.ReadKey();
-                            return 0; // mainMenuSelection to complete operation;
-                        }
-                        else if (deleteStd == "no")
-                        {
-                            return 0; // mainMenuSelection to cancel operation
-                        }
-                    } while (deleteStd != "no" || deleteStd != "yes");
-                    return 0; // mainMenuSelection to complete operation
-                }
+                        classrooms[classIndex].students.RemoveAt(stdIndex);
+                        Console.Clear();
+                        StdInfo(classIndex, stdIndex, false); // View the Std information with the Std being edited highlighted in red
+                        PrintRed__($"\n {stdName}");
+                        Console.WriteLine(" has been successfully deleted!\n Press any key to continue"); Console.ReadKey(); return 0;
+                    } else if (deleteStd == "no")
+                        return 0; // mainMenuSelection to cancel operation
+                } while (deleteStd != "no" || deleteStd != "yes");
+                return 0; // mainMenuSelection to complete operation                
+            }           
+        }
+        public static int EditStdName(int classIndex, int stdIndex)
+        {
+            string stdName, newStdName, newFirstName, newLastName;
+            int stdID = 0;
+            bool indexTest;
+
+            if (StdInfo(classIndex, -1, false) == 1)
+            {   // View Std header. If theare are no Std, quit module
+                Console.WriteLine("\n Press any key to continue"); Console.ReadKey(); return 0;
+            }
+            PrintLineRed__("\n Type \"Q\" to cancel this operation. ");
+            PrintBlue_(" Enter the student's name or ID number: ".ToUpper());
+            stdName = Console.ReadLine().ToLower();
+            if (stdName == "q") { return 0; } // Quits this method if the user enters "q"
+            indexTest = stdName.All(char.IsDigit); // Tests if the user's input can be converted into a digit
+            if (indexTest == true)
+            {   // If the user entered the std ID number then...
+                stdIndex = classrooms[classIndex].students.FindIndex(x => x.studID == int.Parse(stdName)); // Try the Std ID
+                if (stdIndex == -1) // Try the Std name if Std ID is not found
+                    stdIndex = classrooms[classIndex].students.FindIndex(x => x.studName.ToLower() == stdName);
+            }
+            else // If the user entered the Std name then...
+                stdIndex = classrooms[classIndex].students.FindIndex(x => x.studName.ToLower() == stdName);
+            if (stdIndex == -1)
+            {   // If the input from the user is incorrect, this method will restart
+                PrintLineRed__(" You have entered an invalid name or ID. \n Press any key and try again."); Console.ReadKey(); return 4;
+            } else
+            {
+                stdID = classrooms[classIndex].students[stdIndex].studID; // Gets the Std ID to highlight it on the page
+                stdName = classrooms[classIndex].students[stdIndex].studName; // Get the Std name to be deleted
+                StdInfo(classIndex, stdIndex, false); // View the Std information with the Std being edited highlighted in red
+                PrintBlue_("\n Enter a new First Name: ".ToUpper()); // Gets the new First Name
+                newFirstName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(Console.ReadLine().ToLower());
+                PrintBlue_("\n Enter a new Last Name: ".ToUpper()); // Gets the new Last Name
+                newLastName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(Console.ReadLine().ToLower());
+                classrooms[classIndex].students[stdIndex].studFirstName = newFirstName; // Edits the std first name
+                classrooms[classIndex].students[stdIndex].studLastName = newLastName; // Edits the std last name
+                newStdName = newFirstName + " " + newLastName;
+                classrooms[classIndex].students[stdIndex].studName = newStdName; // Edits the std full name
+                StdInfo(classIndex, stdIndex, false); // View the Std information with the Std being edited highlighted in red
+                Console.Write($"\n Student ");
+                PrintRed__(stdName);
+                Console.Write(" has been successfully renamed ");
+                PrintLineRed__($"{newStdName}.");
+                Console.WriteLine(" Press any key to continue."); Console.ReadKey(); return 0;
             }
         }
-        public static string StdGPACalc(int classIndex, int stdIndex)
+        public static string CalcStdGPA(int classIndex, int stdIndex)
         {
             int stdGradesTotal = 0;
             int assignmentsPerStd;
             double stdAvgGrade;
 
             assignmentsPerStd = classrooms[classIndex].students[stdIndex].assignments.Count;
-
-            for (int i = 0; i < assignmentsPerStd; i++)
-            {
+            for (int i = 0; i < assignmentsPerStd; i++) // Iterates through all std's assignments in class and adds the grades
                 stdGradesTotal += classrooms[classIndex].students[stdIndex].assignments[i].assignmentGrade;
-            }
-            stdAvgGrade = (double)stdGradesTotal / assignmentsPerStd;
-            stdAvgGrade = Math.Round(stdAvgGrade, 2);
-
-            if (assignmentsPerStd == 0)
+            stdAvgGrade = (double)stdGradesTotal / assignmentsPerStd; // Calculates the Std GPA
+            stdAvgGrade = Math.Round(stdAvgGrade, 2); // Rounds the GPA to 2 decimals
+            if (assignmentsPerStd == 0) // If there are no assignments for student....
                 return "N/A";
-            else
+            else // Otherwise, return Std GPA in string format
                 return stdAvgGrade.ToString();
         }
         public static void ViewStdBestWorseGrades(int classIndex, int stdIndex)
         {
             string stdName = classrooms[classIndex].students[stdIndex].studName;
             int assignmentsPerStd = classrooms[classIndex].students[stdIndex].assignments.Count;
-            int maxGrade;
-            int minGrade;
+            int maxGrade, minGrade;
 
             try
-            {
+            {   // Tries to obtain the Std best grade. If it fails the catch the ex
                 maxGrade = classrooms[classIndex].students[stdIndex].assignments.Max(x => x.assignmentGrade);
                 PrintLineRed__($"\n Best Grade is: {maxGrade}");
             }
             catch
-            {
-                PrintLineRed__(" Unable to calculate the best grade at this time.");
+            {   // Prints the below msg
+                PrintLineRed__("\n Unable to calculate the best grade at this time.");
             }
             try
-            {
+            {   // Tries to obtain the Std worse grade. If it fails the catch the ex
                 minGrade = classrooms[classIndex].students[stdIndex].assignments.Min(x => x.assignmentGrade);
                 PrintLineRed__($" Worse Grade is: {minGrade}");
             }
             catch
-            {
+            {   // Prints the below msg
                 PrintLineRed__(" Unable to calculate the worse grade at this time.");
             }
         }
-        public static void ViewTopAndBottomStudent(int classIndex)
-        {
-            int stdCount = classrooms[classIndex].students.Count;
-            int assignmentsPerClass = 0;
-            double maxGPA;
-            double minGPA = 0;
-
-            // Create a list of Tools to help filter the class student's GPAs
-            List<Tools> stdGPAList = new List<Tools>();
-            // Iterate through all students in the class and try to obtain their GPAs using the StdGPACalc method
-            // Use of try and catch to avoid Max exceptions 
-            for (int j = 0; j < stdCount; j++)
-            {
-                try
-                {
-                    // Adds the student's name and GPA when able
-                    stdGPAList.Add(new Tools(classrooms[classIndex].students[j].studName, double.Parse(StdGPACalc(classIndex, j))));
-                    // Keeps count of the number of assignments assigned to each student in the class
-                    assignmentsPerClass += classrooms[classIndex].students[j].assignments.Count;
-                }
-                catch
-                {
-                    // Otherwise, set the GPA to zero becuase the student does not have any assignments (dividing by zero exception)
-                    stdGPAList.Add(new Tools(classrooms[classIndex].students[j].studName, 0));
-                    // Keeps count of the number of assignments assigned to each student in the class
-                    assignmentsPerClass += classrooms[classIndex].students[j].assignments.Count;
-                }
-            }
-
-            // Attempt to obtain the best GPA in the class. Try/Catch used to catch .Max ex
-            try { maxGPA = stdGPAList.Max(x => x.gpa); } catch { maxGPA = 0; }
-            // Attempt to obtain the worse GPA in the class. Try/Catch used to catch .Mix ex
-            try { minGPA = stdGPAList.Min(x => x.gpa); } catch { minGPA = 0; }
-            // Query the students with the best and worse GPAs from the filtered list maxGPA and minGPA
-            IEnumerable<Tools> queryMax = stdGPAList.Where(x => x.gpa.Equals(maxGPA));
-            IEnumerable<Tools> queryMin = stdGPAList.Where(x => x.gpa.Equals(minGPA));
-            // Prints the message below if classroom's GPA is zero and there are zero assignments in the class
-            if (maxGPA == 0 && minGPA == 0 && assignmentsPerClass <= 0 && stdCount > 0)
-                PrintRed__("\n There are no assignments for any student assigned to the class.");
-            else if (stdCount == 0) // Prints msg below if there are no students assigned to the class
-                PrintRed__("\n There are no students assigned to this classroom.");
-            else // Print the best and worse student(s)
-            {
-                // If there are more than one std with the same high GPA, then...
-                if (queryMax.Count() > 1)
-                    PrintLineBlue_("\n Top Students are: ");
-                else // Single student with highest classroom GPA                
-                    PrintLineBlue_("\n Top Student is: ");
-                // Print and student(s) with the highest GPA (including the student name
-                foreach (var item in queryMax)
-                    Console.WriteLine($" GPA of {item.gpa}: {item.stdName}");
-                // If there are more than one std with the same low GPA, then...
-                if (queryMin.Count() > 1)
-                    PrintLineBlue_(" Bottom Students are: ");
-                else // Single student with lowest classroom GPA
-                    PrintLineBlue_(" Bottom Student is: ");
-                foreach (var item in queryMin)
-                    Console.WriteLine($" GPA of {item.gpa}: {item.stdName}");
-            }
-        }
+        
     }
 }

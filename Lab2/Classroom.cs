@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static Lab2.GlobalVariables;
 using static Lab2.Headers;
 using static Lab2.Tools;
@@ -14,9 +12,6 @@ namespace Lab2
 {
     internal class Classroom
     {
-
-
-
         public int classID;
         public string className;
         public List<Student> students = new List<Student>();
@@ -47,12 +42,12 @@ namespace Lab2
                     if (classroom.classID == updatingElementID)
                     {   // Highlight the class info if the classID is passed to the method.
                         PrintLineRed__(string.Format(" {0,-9}{1,-23}{2,-16}{3,-14}", classroom.classID, classroom.className,
-                            classroom.students.Count, ClassAvgGPACalc(i))); i++;
+                            classroom.students.Count, CalcClassAvgGPA(i))); i++;
                     }
                     else
                     {   // Print normal color
                         Console.WriteLine(string.Format(" {0,-9}{1,-23}{2,-16}{3,-14}", classroom.classID, classroom.className,
-                        classroom.students.Count, ClassAvgGPACalc(i))); i++;
+                        classroom.students.Count, CalcClassAvgGPA(i))); i++;
                     }
                 }
                 return 1; // To continue the opetation in the origin caller
@@ -207,6 +202,55 @@ namespace Lab2
                         return 0; // Operation is canceled
                 } while (deleteClass != "no" || deleteClass != "yes");
                 return 0;
+            }
+        }
+        public static void ViewTopAndBottomStudent(int classIndex)
+        {
+            int stdCount = classrooms[classIndex].students.Count;
+            int assignmentsPerClass = 0;
+            double maxGPA;
+            double minGPA = 0;
+            
+            List<Tools> stdGPAList = new List<Tools>(); // Create a list of Tools to help filter the class student's GPAs
+            for (int j = 0; j < stdCount; j++)
+            {   // Iterate through all students in the class and try to obtain their GPAs using the StdGPACalc method
+                try // Use of try and catch to avoid Max exceptions
+                {   // Adds the student's name and GPA when able
+                    stdGPAList.Add(new Tools(classrooms[classIndex].students[j].studName, double.Parse(CalcStdGPA(classIndex, j))));
+                    // Keeps count of the number of assignments assigned to each student in the class
+                    assignmentsPerClass += classrooms[classIndex].students[j].assignments.Count;
+                }
+                catch
+                {   // Otherwise, set the GPA to zero becuase the student does not have any assignments (dividing by zero exception)
+                    stdGPAList.Add(new Tools(classrooms[classIndex].students[j].studName, 0));
+                    // Keeps count of the number of assignments assigned to each student in the class
+                    assignmentsPerClass += classrooms[classIndex].students[j].assignments.Count;
+                }
+            }            
+            try { maxGPA = stdGPAList.Max(x => x.gpa); } catch { maxGPA = 0; } // Attempt to obtain the best GPA in the class. Try/Catch used to catch .Max ex            
+            try { minGPA = stdGPAList.Min(x => x.gpa); } catch { minGPA = 0; } // Attempt to obtain the worse GPA in the class. Try/Catch used to catch .Mix ex
+            // Query the students with the best and worse GPAs from the filtered list maxGPA and minGPA
+            IEnumerable<Tools> queryMax = stdGPAList.Where(x => x.gpa.Equals(maxGPA));
+            IEnumerable<Tools> queryMin = stdGPAList.Where(x => x.gpa.Equals(minGPA));
+            // Prints the message below if classroom's GPA is zero and there are zero assignments in the class
+            if (maxGPA == 0 && minGPA == 0 && assignmentsPerClass <= 0 && stdCount > 0)
+                PrintRed__("\n There are no assignments for any student assigned to the class.");
+            else if (stdCount == 0) // Prints msg below if there are no students assigned to the class
+                PrintRed__("\n There are no students assigned to this classroom.");
+            else // Print the best and worse student(s)
+            {    // If there are more than one std with the same high GPA, then...
+                if (queryMax.Count() > 1)
+                    PrintLineBlue_("\n Top Students are: ");
+                else // Single student with highest classroom GPA                
+                    PrintLineBlue_("\n Top Student is: ");                
+                foreach (var item in queryMax) // Print and student(s) with the highest GPA (including the student name
+                    Console.WriteLine($" GPA of {item.gpa}: {item.stdName}");                
+                if (queryMin.Count() > 1) // If there are more than one std with the same low GPA, then...
+                    PrintLineBlue_(" Bottom Students are: ");
+                else // Single student with lowest classroom GPA
+                    PrintLineBlue_(" Bottom Student is: ");
+                foreach (var item in queryMin)
+                    Console.WriteLine($" GPA of {item.gpa}: {item.stdName}");
             }
         }
     }

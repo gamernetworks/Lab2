@@ -17,9 +17,7 @@ namespace Lab2
             while (mainMenuLoop == true)
             {
                 mainMenuLoop = MainMenu(mainMenuLoop);
-            }
-            
-            TestingClass.Testing();
+            }            
         }
     }
 }

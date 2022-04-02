@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static Lab2.Tools;
 using static Lab2.GlobalVariables;
 
@@ -12,9 +8,8 @@ namespace Lab2
     {
         public static void MainMenuHeader()
         {
-            ColorChangeToRed();
-            Console.WriteLine("\n             CLASSROOM MANAGEMENT MAIN MENU");
-            Console.ResetColor();
+            Console.Clear();
+            PrintLineRed__("\n             CLASSROOM MANAGEMENT MAIN MENU");
             Console.WriteLine("********************************************************");
         }
         public static void ClassroomMenuHeader()
@@ -24,14 +19,6 @@ namespace Lab2
             Console.WriteLine("********************************************************");            
             PrintLineBlue_(" ID       Class Name      Total Students      Avg Grade");
             Console.WriteLine("********************************************************");
-        }
-        public static void ClassMainHeader()
-        {
-
-        }
-        public static void ClassSubHeader()
-        {
-            
         }
         public static void ClassSubMenuHeader(string className, int stdAssigned, int numOfAssignments, string gpa)
         {
@@ -45,11 +32,6 @@ namespace Lab2
             Console.WriteLine(gpa);
             Console.WriteLine("********************************************************");
             PrintLineBlue_(" ID       Student Name        Assignments       Avg GPA");
-            Console.WriteLine("********************************************************");
-        }
-        public static void ClassSubMenuHeader(string className)
-        {
-            PrintLineRed__($"\n === {className.ToUpper()} === ");
             Console.WriteLine("********************************************************");
         }
         public static void StdMenuHeader(int classIndex, int stdIndex, string gpa)

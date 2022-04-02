@@ -1,12 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static Lab2.Assignment;
 using static Lab2.Classroom;
-using static Lab2.GlobalVariables;
 using static Lab2.Headers;
 using static Lab2.Student;
 using static Lab2.Tools;
@@ -27,23 +21,17 @@ namespace Lab2
             {
                 try
                 {
-                    Console.Clear();
                     MainMenuHeader();
                     Console.WriteLine("\n\n" +
                         "\n                 1. Go to Classroom Menu" +
                         "\n                 2. Quit Application");
                     if (mainMenuSelection < 1 || mainMenuSelection > 2)
-                    {
                         mainMenuSelection = ReadKeyInput();
-                    }
                     if (mainMenuSelection == 1)
-                    {
                         mainMenuLoop = ClassMainMenu();
-                    }
                     else if (mainMenuSelection == 2)
                     {
-                        mainMenuLoop = false;
-                        break;
+                        mainMenuLoop = false; break;
                     }
                 }
                 catch
@@ -59,8 +47,7 @@ namespace Lab2
             while (true)
             {
                 try
-                {
-                    // View every classroom with its ID, name, std count and GPA.                    
+                {   // View every classroom with its ID, name, std count and GPA.
                     SchoolInfo(-1); // Use -1 in method to disable highlighting
                     Console.WriteLine("\n" +
                         "\n           1. Manage Classroom" +
@@ -70,28 +57,22 @@ namespace Lab2
                         "\n           5. Return to Previous Menu" +
                         "\n           6. Quit Application");
                     if (classMainMenuSelection < 1 || classMainMenuSelection > 6)
-                    {
                         classMainMenuSelection = ReadKeyInput();
-                    }
                     if (classMainMenuSelection == 1) // Goto Classroom SubMenu
                     {
-                        classMainMenuSelection = ManageClass();
-                        break;
+                        classMainMenuSelection = ManageClass(); break;
                     }
                     else if (classMainMenuSelection == 2) // Add New Classroom
                     {                        
-                        classMainMenuSelection = AddClass();
-                        break;
+                        classMainMenuSelection = AddClass(); break;
                     }
                     else if (classMainMenuSelection == 3) // Edit Classroom Name
                     {
-                        classMainMenuSelection = EditClassName();
-                        break;
+                        classMainMenuSelection = EditClassName(); break;
                     }
                     else if (classMainMenuSelection == 4) // Remove Classroom
                     {
-                        classMainMenuSelection = RemoveClass();
-                        break;
+                        classMainMenuSelection = RemoveClass(); break;
                     }
                     else if (classMainMenuSelection == 5) // Return to Previous Menu
                     {
@@ -116,11 +97,12 @@ namespace Lab2
         }
         public static bool ClassSubMenu(int classIndex)
         {
+            int stdIndex;
             while (true)
             {
                 try
-                {                    
-                    ClassStdInfo(classIndex, -1, true); // -1 = Deactivate Highlights. true = show top/bottom stds
+                {
+                    StdInfo(classIndex, -1, true); // -1 = Deactivate Highlights. true = show top/bottom stds
                     Console.Write("\n" +
                         "\n           1. Manage Student" +
                         "\n           2. Add New Student" +
@@ -131,33 +113,27 @@ namespace Lab2
                         "\n           5. Return to Previous Menu" +
                         "\n           6. Quit Application");
                     if (classSubMenuSelection < 1 || classSubMenuSelection > 6)
-                    {
                         classSubMenuSelection = ReadKeyInput();
-                    }
                     if (classSubMenuSelection == 1)
                     {
-                        classSubMenuSelection = ManageStd(classIndex);
-                    }
-                    else if (classSubMenuSelection == 2)
-                    {
-                        classSubMenuSelection = AddStd(classIndex);                            
-                    }
+                        //classSubMenuSelection = ManageStd(classIndex);
+                        stdIndex = ManageStd(classIndex);
+                        if (stdIndex == -1)
+                            classSubMenuSelection = 0;
+                        else
+                            classSubMenuSelection = StdMenu(classIndex, stdIndex);
+                    } else if (classSubMenuSelection == 2)
+                        classSubMenuSelection = AddStd(classIndex);
                     else if (classSubMenuSelection == 3)
-                    {
                         classSubMenuSelection = RemoveStd(classIndex);
-                    }
                     else if (classSubMenuSelection == 4)
-                    {
                         classSubMenuSelection = 0;
-                    }
                     else if (classSubMenuSelection == 5)
                     {
                         classSubMenuSelection = 0;
                         classMainMenuSelection = 0;
-                        //mainMenuLoop = true;
                         break;
-                    }
-                    else if (classSubMenuSelection == 6)
+                    } else if (classSubMenuSelection == 6)
                     {
                         classSubMenuSelection = 0;
                         classMainMenuSelection = 6;
@@ -188,25 +164,15 @@ namespace Lab2
                         "\n           5. Return to Previous Menu" +
                         "\n           6. Quit Application");
                     if (stdMenuSelection < 1 || stdMenuSelection > 6)
-                    {
                         stdMenuSelection = ReadKeyInput();
-                    }
                     if (stdMenuSelection == 1)
-                    {
                         stdMenuSelection = EditStdName(classIndex, stdIndex);
-                    }
                     else if (stdMenuSelection == 2)
-                    {
                         stdMenuSelection = AddAssignment(classIndex, stdIndex);
-                    }
                     else if (stdMenuSelection == 3)
-                    {
                         stdMenuSelection = RemoveAssignment(classIndex, stdIndex);
-                    }
                     else if (stdMenuSelection == 4)
-                    {
                         stdMenuSelection = AddEditAssignmentGrade(classIndex, stdIndex);
-                    }
                     else if (stdMenuSelection == 5)
                     {
                         stdMenuSelection = 0;
